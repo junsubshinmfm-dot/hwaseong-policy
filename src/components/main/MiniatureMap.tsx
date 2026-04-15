@@ -129,7 +129,8 @@ export default function MiniatureMap() {
   return (
     <div className="w-full">
       {/* SNS 링크 */}
-      <div className="flex items-center justify-between mb-2 sm:mb-3 px-1">
+      <div className="mb-2 sm:mb-3 px-1">
+        <p className="text-navy font-bold text-xs sm:text-sm mb-1.5">정명근 SNS 바로가기</p>
         <div className="flex items-center gap-2 sm:gap-3">
           {/* 페이스북 */}
           <a href="https://www.facebook.com/mg0628?locale=ko_KR" target="_blank" rel="noopener noreferrer"
@@ -155,12 +156,12 @@ export default function MiniatureMap() {
           {/* 네이버블로그 */}
           <a href="https://blog.naver.com/hwaseong_mg" target="_blank" rel="noopener noreferrer"
             className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center bg-[#03C75A] hover:scale-110 transition-transform shadow-sm">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z" />
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none">
+              <rect width="24" height="24" rx="4" fill="#03C75A" />
+              <path d="M8 6h2.5v4.8L15 6h3l-5.2 5.5L18 18h-3l-4.5-5.8V18H8V6Z" fill="white" />
             </svg>
           </a>
         </div>
-        <span className="text-[10px] sm:text-xs text-navy/30 font-medium hidden sm:block">HWASEONG CITY</span>
       </div>
 
       {/* ── 메인 미니어처 뷰 ── */}
