@@ -6,6 +6,7 @@ import SidePanel from '@/components/main/SidePanel';
 import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
 import ProfileBanner from '@/components/main/ProfileBanner';
+import CategoryChart from '@/components/main/CategoryChart';
 
 export default function MainPage() {
   return (
@@ -46,6 +47,11 @@ export default function MainPage() {
           >
             <SidePanel />
           </motion.div>
+        </div>
+
+        {/* 모바일 전용: 분야별 공약 바차트 */}
+        <div className="lg:hidden px-3 sm:px-4 pb-6">
+          <CategoryChart />
         </div>
       </div>
 
