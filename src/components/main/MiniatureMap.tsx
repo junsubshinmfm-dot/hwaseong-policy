@@ -9,6 +9,7 @@ import policiesData from '@/data/policies.json';
 import { useTimeOfDay, TIME_STYLES } from '@/hooks/useTimeOfDay';
 import { useWeather } from '@/hooks/useWeather';
 import WeatherEffects from './WeatherEffects';
+import SkyBody from './SkyBody';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const CITY_IMAGE: string | null = `${BASE}/images/miniature-city.png`;
@@ -170,6 +171,8 @@ export default function MiniatureMap() {
         className="relative rounded-2xl overflow-hidden shadow-xl border border-navy/10"
       >
         <div className="absolute inset-0 transition-all duration-[3000ms]" style={{ background: timeStyle.bgGradient }} />
+        {/* 해/달 */}
+        <SkyBody period={time.period} />
 
         <div className="relative w-full aspect-square">
           {CITY_IMAGE ? (
@@ -186,8 +189,27 @@ export default function MiniatureMap() {
           )}
           <WeatherEffects type={weather.type} />
           {time.period === 'night' && (
-            <div className="absolute inset-0 pointer-events-none"
-              style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(253,224,71,0.06) 0%, transparent 50%)' }} />
+            <>
+              {/* 도시 불빛 글로우 */}
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(253,224,71,0.06) 0%, transparent 50%)' }} />
+              {/* 밤하늘 별 */}
+              <div className="absolute inset-0 pointer-events-none z-[1]">
+                {[...Array(20)].map((_, i) => (
+                  <div key={i} className="absolute rounded-full bg-white animate-pulse"
+                    style={{
+                      width: `${1 + Math.random()}px`,
+                      height: `${1 + Math.random()}px`,
+                      top: `${Math.random() * 35}%`,
+                      left: `${5 + Math.random() * 90}%`,
+                      opacity: 0.3 + Math.random() * 0.5,
+                      animationDelay: `${Math.random() * 3}s`,
+                      animationDuration: `${2 + Math.random() * 2}s`,
+                    }}
+                  />
+                ))}
+              </div>
+            </>
           )}
 
           {/* 권역 SVG 다각형 오버레이 */}
