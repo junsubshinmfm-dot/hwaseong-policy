@@ -55,20 +55,6 @@ export default function ShareButtons({ title, description, url, direction = 'row
 
   return (
     <div className={`flex items-center gap-2 ${direction === 'column' ? 'flex-col' : ''}`}>
-      {/* 카카오톡 */}
-      <button
-        onClick={handleKakaoShare}
-        onMouseEnter={() => setTooltip('kakao')}
-        onMouseLeave={() => setTooltip(null)}
-        className={`${btnBase} bg-[#FEE500] hover:bg-[#FDD835] shadow-lg shadow-yellow-500/20`}
-        aria-label="카카오톡 공유"
-      >
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#3C1E1E">
-          <path d="M12 3C6.48 3 2 6.58 2 10.9c0 2.8 1.86 5.27 4.66 6.67l-1.19 4.37c-.1.37.33.66.64.44l5.19-3.44c.23.02.46.03.7.03 5.52 0 10-3.58 10-7.97S17.52 3 12 3z" />
-        </svg>
-        <Tooltip show={tooltip === 'kakao'} label="카카오톡" />
-      </button>
-
       {/* Facebook */}
       <button
         onClick={handleFacebookShare}
@@ -81,20 +67,6 @@ export default function ShareButtons({ title, description, url, direction = 'row
           <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
         </svg>
         <Tooltip show={tooltip === 'fb'} label="Facebook" />
-      </button>
-
-      {/* X (Twitter) */}
-      <button
-        onClick={handleTwitterShare}
-        onMouseEnter={() => setTooltip('x')}
-        onMouseLeave={() => setTooltip(null)}
-        className={`${btnBase} bg-gray-100 hover:bg-gray-200 text-gray-700 shadow-lg shadow-gray-200/30`}
-        aria-label="X 공유"
-      >
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-        </svg>
-        <Tooltip show={tooltip === 'x'} label="X" />
       </button>
 
       {/* 공유 API (모바일) */}
