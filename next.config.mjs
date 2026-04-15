@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  basePath: '/hwaseong-policy',
+  assetPrefix: '/hwaseong-policy/',
   images: {
     unoptimized: true,
   },
