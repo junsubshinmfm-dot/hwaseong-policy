@@ -95,34 +95,40 @@ export default function SkyBody({ period }: SkyBodyProps) {
         </div>
       </div>
 
-      {/* 밤하늘 별 (많이) */}
+      {/* 밤하늘 별 */}
       <div className="absolute inset-0 pointer-events-none z-[1]">
-        {[...Array(35)].map((_, i) => (
-          <div key={i} className="absolute rounded-full bg-white animate-pulse"
-            style={{
-              width: `${1 + Math.random() * 1.5}px`,
-              height: `${1 + Math.random() * 1.5}px`,
-              top: `${Math.random() * 30}%`,
-              left: `${3 + Math.random() * 94}%`,
-              opacity: 0.3 + Math.random() * 0.6,
-              animationDelay: `${Math.random() * 4}s`,
-              animationDuration: `${1.5 + Math.random() * 2.5}s`,
-            }}
-          />
-        ))}
-        {/* 밝은 별 몇개 (십자 빛) */}
+        {/* 작은 별 (4각 별 모양 SVG) */}
+        {[...Array(30)].map((_, i) => {
+          const size = 3 + Math.random() * 4;
+          return (
+            <svg key={i} className="absolute animate-pulse"
+              width={size} height={size} viewBox="0 0 10 10"
+              style={{
+                top: `${Math.random() * 30}%`,
+                left: `${3 + Math.random() * 94}%`,
+                opacity: 0.3 + Math.random() * 0.6,
+                animationDelay: `${Math.random() * 4}s`,
+                animationDuration: `${1.5 + Math.random() * 2.5}s`,
+              }}>
+              <path d="M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z" fill="white" />
+            </svg>
+          );
+        })}
+        {/* 밝은 큰 별 */}
         {[
           { top: '8%', left: '25%' },
           { top: '15%', left: '55%' },
           { top: '5%', left: '75%' },
+          { top: '12%', left: '40%' },
         ].map((pos, i) => (
-          <div key={`bright-${i}`} className="absolute animate-pulse" style={{ ...pos, animationDelay: `${i}s` }}>
-            <div className="relative w-2 h-2">
-              <div className="absolute inset-0 rounded-full bg-white/80" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1px] h-4 bg-white/30" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-[1px] bg-white/30" />
-            </div>
-          </div>
+          <svg key={`bright-${i}`} className="absolute animate-pulse"
+            width="12" height="12" viewBox="0 0 24 24"
+            style={{ ...pos, animationDelay: `${i * 0.8}s`, animationDuration: '2.5s' }}>
+            <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z"
+              fill="white" opacity="0.8" />
+            <path d="M12 3 L13 9.5 L19 12 L13 14.5 L12 21 L11 14.5 L5 12 L11 9.5 Z"
+              fill="white" opacity="0.5" />
+          </svg>
         ))}
       </div>
     </>
