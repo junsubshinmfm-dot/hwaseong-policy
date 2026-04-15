@@ -124,6 +124,12 @@ body {
 .animate-rain-fall { animation: rain-fall 0.4s linear infinite; }
 .animate-snow-fall { animation: snow-fall 3s linear infinite; }
 
+/* ── 구름 애니메이션 ── */
+@keyframes cloud-float {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(15px); }
+}
+
 /* ── 별똥별 ── */
 .shooting-star {
   position: absolute;

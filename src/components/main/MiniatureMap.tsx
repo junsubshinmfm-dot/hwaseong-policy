@@ -189,27 +189,8 @@ export default function MiniatureMap() {
           )}
           <WeatherEffects type={weather.type} />
           {time.period === 'night' && (
-            <>
-              {/* 도시 불빛 글로우 */}
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(253,224,71,0.06) 0%, transparent 50%)' }} />
-              {/* 밤하늘 별 */}
-              <div className="absolute inset-0 pointer-events-none z-[1]">
-                {[...Array(20)].map((_, i) => (
-                  <div key={i} className="absolute rounded-full bg-white animate-pulse"
-                    style={{
-                      width: `${1 + Math.random()}px`,
-                      height: `${1 + Math.random()}px`,
-                      top: `${Math.random() * 35}%`,
-                      left: `${5 + Math.random() * 90}%`,
-                      opacity: 0.3 + Math.random() * 0.5,
-                      animationDelay: `${Math.random() * 3}s`,
-                      animationDuration: `${2 + Math.random() * 2}s`,
-                    }}
-                  />
-                ))}
-              </div>
-            </>
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(253,224,71,0.06) 0%, transparent 50%)' }} />
           )}
 
           {/* 권역 SVG 다각형 오버레이 */}
