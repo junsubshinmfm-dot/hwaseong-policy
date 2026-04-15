@@ -155,9 +155,12 @@ export default function MiniatureMap() {
           </a>
           {/* 네이버블로그 */}
           <a href="https://blog.naver.com/hwaseong_mg" target="_blank" rel="noopener noreferrer"
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center bg-[#03C75A] hover:scale-110 transition-transform shadow-sm">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none">
-              <text x="5" y="18" fontFamily="Arial, sans-serif" fontSize="16" fontWeight="900" fill="white">B</text>
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center bg-[#03C75A] hover:scale-110 transition-transform shadow-sm overflow-hidden">
+            <svg className="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 48 48" fill="none">
+              {/* 말풍선 */}
+              <path d="M8 8h32v24a4 4 0 01-4 4H22l-8 8v-8h-2a4 4 0 01-4-4V12a4 4 0 014-4z" fill="white" />
+              {/* blog 텍스트 */}
+              <text x="11" y="27" fontFamily="Arial, sans-serif" fontSize="11" fontWeight="900" fill="#F58220">blog</text>
             </svg>
           </a>
         </div>
