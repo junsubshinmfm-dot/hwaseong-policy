@@ -35,8 +35,7 @@ export default function Navbar() {
             <img
               src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/hwaseong-logo.png`}
               alt="화성특례시"
-              className="w-auto object-contain"
-              style={{ height: '280px' }}
+              className="w-auto object-contain h-[120px] sm:h-[180px] lg:h-[280px]"
             />
           </Link>
 
