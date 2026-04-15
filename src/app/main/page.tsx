@@ -19,16 +19,15 @@ export default function MainPage() {
       <GeoPattern variant="corner-tl" className="w-[250px] h-[250px] z-0 opacity-80 hidden lg:block" />
       <GeoPattern variant="corner-br" className="w-[300px] h-[300px] z-0 opacity-80 hidden lg:block" />
 
-      {/* 모바일: 프로필 배너 → 지도 → 분야별 공약 세로 배치 */}
-      {/* 데스크톱: 지도 + 사이드 패널 가로 배치 */}
       <div className="relative z-10 pt-16 md:pt-20">
 
-        {/* 모바일 전용: 프로필 가로 배너 */}
+        {/* 모바일 전용: 프로필 배너 */}
         <div className="lg:hidden">
           <ProfileBanner />
         </div>
 
         <div className="flex flex-col lg:flex-row lg:min-h-screen">
+          {/* 지도 + 모바일 분야별 공약 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -36,9 +35,14 @@ export default function MainPage() {
             className="flex-1 p-2 sm:p-4 lg:p-8 lg:pl-12"
           >
             <MiniatureMap />
+
+            {/* 모바일: 지도 바로 아래 분야별 공약 */}
+            <div className="lg:hidden mt-3">
+              <CategoryChart />
+            </div>
           </motion.div>
 
-          {/* 데스크톱 전용: 사이드 패널 */}
+          {/* 데스크톱: 사이드 패널 */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -48,18 +52,13 @@ export default function MainPage() {
             <SidePanel />
           </motion.div>
         </div>
-
-        {/* 모바일 전용: 분야별 공약 바차트 */}
-        <div className="lg:hidden px-3 sm:px-4 pb-6 -mt-4">
-          <CategoryChart />
-        </div>
       </div>
 
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="relative z-10 text-center text-navy/30 text-sm font-medium pb-4 -mt-6 lg:-mt-4"
+        className="relative z-10 text-center text-navy/30 text-sm font-medium py-4"
       >
         미니어처를 클릭하면 해당 권역의 공약을 볼 수 있습니다
       </motion.p>
