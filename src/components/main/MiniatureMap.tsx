@@ -157,8 +157,7 @@ export default function MiniatureMap() {
           <a href="https://blog.naver.com/hwaseong_mg" target="_blank" rel="noopener noreferrer"
             className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center bg-[#03C75A] hover:scale-110 transition-transform shadow-sm">
             <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none">
-              <rect width="24" height="24" rx="4" fill="#03C75A" />
-              <path d="M8 6h2.5v4.8L15 6h3l-5.2 5.5L18 18h-3l-4.5-5.8V18H8V6Z" fill="white" />
+              <text x="5" y="18" fontFamily="Arial, sans-serif" fontSize="16" fontWeight="900" fill="white">B</text>
             </svg>
           </a>
         </div>
