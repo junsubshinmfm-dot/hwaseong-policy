@@ -121,8 +121,8 @@ export default function Dashboard({ stats, regionColor }: DashboardProps) {
       autoplay={{ delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: true }}
       freeMode={{ enabled: true, sticky: true }}
       loop
-      spaceBetween={16}
-      slidesPerView={1.2}
+      spaceBetween={10}
+      slidesPerView={1.8}
       breakpoints={{
         480: { slidesPerView: 1.5, spaceBetween: 16 },
         640: { slidesPerView: 2, spaceBetween: 16 },
