@@ -10,7 +10,8 @@ import { useTimeOfDay, TIME_STYLES } from '@/hooks/useTimeOfDay';
 import { useWeather } from '@/hooks/useWeather';
 import WeatherEffects from './WeatherEffects';
 
-const CITY_IMAGE: string | null = '/images/miniature-city.png';
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const CITY_IMAGE: string | null = `${BASE}/images/miniature-city.png`;
 
 /**
  * 권역별 SVG 다각형 좌표 (% 기준)

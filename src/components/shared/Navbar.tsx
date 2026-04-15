@@ -33,7 +33,7 @@ export default function Navbar() {
           <Link href="/main" className="shrink-0" style={{ marginLeft: '-160px' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/hwaseong-logo.png"
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/hwaseong-logo.png`}
               alt="화성특례시"
               className="w-auto object-contain"
               style={{ height: '220px' }}
