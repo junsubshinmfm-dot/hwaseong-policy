@@ -13,11 +13,11 @@ export default function SkyBody({ period }: SkyBodyProps) {
         {/* 해 */}
         <div className="absolute top-[4%] left-[12%] z-[2] pointer-events-none">
           <div className="relative">
-            <div className="absolute -inset-10 rounded-full bg-yellow-300/15 animate-pulse" />
-            <div className="absolute -inset-5 rounded-full bg-yellow-200/25" />
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-yellow-100 via-yellow-300 to-orange-400 shadow-[0_0_50px_15px_rgba(255,220,50,0.35)]" />
+            <div className="absolute -inset-4 sm:-inset-10 rounded-full bg-yellow-300/15 animate-pulse" />
+            <div className="absolute -inset-2 sm:-inset-5 rounded-full bg-yellow-200/25" />
+            <div className="w-8 h-8 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-yellow-100 via-yellow-300 to-orange-400 shadow-[0_0_50px_15px_rgba(255,220,50,0.35)]" />
             {/* 광선 */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-36 sm:h-36">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-36 sm:h-36">
               {[...Array(12)].map((_, i) => (
                 <div key={i} className="absolute top-1/2 left-1/2 w-[1.5px] bg-yellow-300/30 origin-bottom"
                   style={{
@@ -44,7 +44,7 @@ export default function SkyBody({ period }: SkyBodyProps) {
             <div className="absolute -inset-8 rounded-full bg-orange-300/20 animate-pulse" />
             <div className="absolute -inset-4 rounded-full bg-orange-200/25" />
             <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-gradient-to-br from-yellow-200 via-orange-400 to-red-400 shadow-[0_0_40px_12px_rgba(255,150,50,0.35)]"
-              style={{ width: 'clamp(56px,5vw,72px)', height: 'clamp(56px,5vw,72px)' }} />
+              style={{ width: 'clamp(32px,5vw,72px)', height: 'clamp(32px,5vw,72px)' }} />
             {/* 수평선 빛 */}
             <div className="absolute top-1/2 -left-16 -right-16 h-[3px] bg-gradient-to-r from-transparent via-orange-300/50 to-transparent" />
             <div className="absolute top-1/2 -left-10 -right-10 h-[1px] mt-2 bg-gradient-to-r from-transparent via-pink-300/30 to-transparent" />
@@ -63,7 +63,7 @@ export default function SkyBody({ period }: SkyBodyProps) {
             <div className="absolute -inset-8 rounded-full bg-red-400/20 animate-pulse" />
             <div className="absolute -inset-4 rounded-full bg-orange-400/25" />
             <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-gradient-to-br from-yellow-300 via-orange-500 to-red-600 shadow-[0_0_40px_12px_rgba(255,100,30,0.35)]"
-              style={{ width: 'clamp(56px,5vw,72px)', height: 'clamp(56px,5vw,72px)' }} />
+              style={{ width: 'clamp(32px,5vw,72px)', height: 'clamp(32px,5vw,72px)' }} />
             <div className="absolute top-1/2 -left-16 -right-16 h-[3px] bg-gradient-to-r from-transparent via-red-400/50 to-transparent" />
             <div className="absolute top-1/2 -left-10 -right-10 h-[1px] mt-2 bg-gradient-to-r from-transparent via-orange-300/30 to-transparent" />
           </div>
@@ -82,7 +82,7 @@ export default function SkyBody({ period }: SkyBodyProps) {
           <div className="absolute -inset-6 rounded-full bg-blue-200/8" />
           <div className="absolute -inset-3 rounded-full bg-blue-100/5" />
           <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-gradient-to-br from-gray-50 via-gray-200 to-gray-400 shadow-[0_0_30px_8px_rgba(200,220,255,0.2)] relative overflow-hidden"
-            style={{ width: 'clamp(56px,5vw,72px)', height: 'clamp(56px,5vw,72px)' }}>
+            style={{ width: 'clamp(32px,5vw,72px)', height: 'clamp(32px,5vw,72px)' }}>
             {/* 크레이터 */}
             <div className="absolute top-[20%] left-[15%] w-3 h-3 rounded-full bg-gray-400/20" />
             <div className="absolute top-[45%] left-[35%] w-2 h-2 rounded-full bg-gray-400/15" />
