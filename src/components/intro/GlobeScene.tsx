@@ -194,7 +194,7 @@ export default function GlobeScene() {
               className="mb-4"
             >
               <svg
-                className="w-10 h-10 text-white/40"
+                className="w-10 h-10 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -207,7 +207,8 @@ export default function GlobeScene() {
                 />
               </svg>
             </motion.div>
-            <p className="text-white/50 text-base md:text-lg font-light tracking-wide">
+            <p className="text-white text-base md:text-lg font-semibold tracking-wide"
+              style={{ textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
               지구를 클릭하세요
             </p>
           </motion.div>
