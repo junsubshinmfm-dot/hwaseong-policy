@@ -3,25 +3,180 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F4F5F9;
+  --foreground: #1A3B8F;
+  --card: #FFFFFF;
+  --card-border: #D6DBE9;
+  --muted: #5A6A8A;
+  --accent: #F58220;
+  --navy: #1A3B8F;
+  --navy-light: #2B55B2;
+  --navy-dark: #0D1F4D;
+  --orange: #F58220;
+  --orange-light: #F9A04E;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-size: 18px;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.7;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.h-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+
+@supports (padding: env(safe-area-inset-top)) {
+  .safe-top    { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-x      { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+}
+
+/* ── 글래스모피즘 ── */
+.glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(26, 59, 143, 0.06);
+  box-shadow: 0 2px 12px rgba(26, 59, 143, 0.06);
+}
+
+/* ── 브랜드 카드 ── */
+.brand-card {
+  background: #fff;
+  border: 1px solid rgba(26, 59, 143, 0.08);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 6px rgba(26, 59, 143, 0.04), 0 6px 16px rgba(26, 59, 143, 0.03);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.brand-card:hover {
+  box-shadow: 0 4px 16px rgba(26, 59, 143, 0.10), 0 12px 32px rgba(26, 59, 143, 0.06);
+}
+
+/* ── 네이비 카드 (진한 배경) ── */
+.brand-card-navy {
+  background: linear-gradient(135deg, #1A3B8F 0%, #152F73 100%);
+  border: none;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 16px rgba(26, 59, 143, 0.25);
+  color: white;
+}
+
+/* ── 오렌지 악센트 카드 ── */
+.brand-card-accent {
+  background: #fff;
+  border-left: 4px solid #F58220;
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 6px rgba(245, 130, 32, 0.08), 0 6px 16px rgba(26, 59, 143, 0.03);
+}
+
+/* ── 커스텀 스크롤바 ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(26, 59, 143, 0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(26, 59, 143, 0.25); }
+
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ── Swiper 오버라이드 ── */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #1A3B8F !important;
+  background: rgba(255, 255, 255, 0.95);
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26, 59, 143, 0.12);
+  border: 1px solid rgba(26, 59, 143, 0.10);
+}
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px !important;
+  font-weight: bold;
+}
+
+@supports not (backdrop-filter: blur(16px)) {
+  .glass { background: rgba(255, 255, 255, 0.97); }
+}
+
+@media (hover: none) {
+  .group:hover .group-hover\:scale-110 { transform: none; }
+}
+
+/* ── 날씨 애니메이션 ── */
+@keyframes rain-fall {
+  0% { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+}
+@keyframes snow-fall {
+  0% { transform: translateY(-200px) translateX(10px); }
+  100% { transform: translateY(0) translateX(-10px); }
+}
+.animate-rain-fall { animation: rain-fall 0.4s linear infinite; }
+.animate-snow-fall { animation: snow-fall 3s linear infinite; }
+
+/* ── 별똥별 ── */
+.shooting-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: shooting-star-move 4s ease-in infinite;
+}
+.shooting-star::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 60px;
+  height: 1.5px;
+  background: linear-gradient(to left, rgba(255,255,255,0.8), rgba(255,255,255,0.3) 30%, transparent);
+  transform: translateY(-50%);
+}
+.shooting-star::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(to left, rgba(200,220,255,0.4), rgba(200,220,255,0.1) 40%, transparent);
+  transform: translateY(-50%);
+}
+@keyframes shooting-star-move {
+  0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+  3% { opacity: 1; }
+  20% { transform: translate(300px, 180px) rotate(-35deg); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ── 태양계 애니메이션 ── */
+@keyframes orbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+@keyframes shootingStar {
+  0% { transform: translate(0, 0) rotate(-45deg); opacity: 0; }
+  5% { opacity: 1; }
+  15% { transform: translate(200px, 200px) rotate(-45deg); opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

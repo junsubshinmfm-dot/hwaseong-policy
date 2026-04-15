@@ -1,0 +1,194 @@
+[
+  {
+    "id": "dongtan",
+    "name": "동탄구",
+    "color": "#4A90D9",
+    "policyCount": 28,
+    "stats": {
+      "population": {
+        "total": 350000,
+        "male": 178000,
+        "female": 172000,
+        "children": 72000,
+        "youth": 65000,
+        "young": 85000,
+        "elderly": 32000,
+        "trend": [320000, 330000, 340000, 345000, 350000]
+      },
+      "economy": {
+        "employmentRate": 72.1,
+        "unemploymentRate": 2.3,
+        "grdp": 28.5,
+        "businesses": 18500,
+        "workers": 165000
+      },
+      "education": {
+        "kindergartens": 52,
+        "elementary": 35,
+        "middle": 15,
+        "high": 10,
+        "students": { "elementary": 22000, "middle": 11000, "high": 8500 }
+      },
+      "welfare": {
+        "hospitals": 12,
+        "clinics": 185,
+        "pharmacies": 95,
+        "healthCenters": 2
+      },
+      "traffic": {
+        "busRoutes": 45,
+        "accidents": 320,
+        "roadLength": 285
+      },
+      "environment": {
+        "parkArea": 2.8,
+        "greenRatio": 32.5,
+        "airQuality": 42
+      }
+    }
+  },
+  {
+    "id": "byeongjeom",
+    "name": "병점구",
+    "color": "#E8734A",
+    "policyCount": 25,
+    "stats": {
+      "population": {
+        "total": 280000,
+        "male": 142000,
+        "female": 138000,
+        "children": 55000,
+        "youth": 52000,
+        "young": 68000,
+        "elderly": 45000,
+        "trend": [260000, 265000, 270000, 275000, 280000]
+      },
+      "economy": {
+        "employmentRate": 68.5,
+        "unemploymentRate": 3.1,
+        "grdp": 22.3,
+        "businesses": 14200,
+        "workers": 128000
+      },
+      "education": {
+        "kindergartens": 38,
+        "elementary": 28,
+        "middle": 12,
+        "high": 8,
+        "students": { "elementary": 17500, "middle": 8800, "high": 6500 }
+      },
+      "welfare": {
+        "hospitals": 8,
+        "clinics": 142,
+        "pharmacies": 72,
+        "healthCenters": 2
+      },
+      "traffic": {
+        "busRoutes": 38,
+        "accidents": 280,
+        "roadLength": 220
+      },
+      "environment": {
+        "parkArea": 2.2,
+        "greenRatio": 28.3,
+        "airQuality": 45
+      }
+    }
+  },
+  {
+    "id": "manse",
+    "name": "만세구",
+    "color": "#5CB85C",
+    "policyCount": 24,
+    "stats": {
+      "population": {
+        "total": 220000,
+        "male": 112000,
+        "female": 108000,
+        "children": 42000,
+        "youth": 40000,
+        "young": 52000,
+        "elderly": 38000,
+        "trend": [200000, 205000, 210000, 215000, 220000]
+      },
+      "economy": {
+        "employmentRate": 65.8,
+        "unemploymentRate": 3.5,
+        "grdp": 18.7,
+        "businesses": 11500,
+        "workers": 98000
+      },
+      "education": {
+        "kindergartens": 30,
+        "elementary": 22,
+        "middle": 10,
+        "high": 6,
+        "students": { "elementary": 13500, "middle": 7200, "high": 5000 }
+      },
+      "welfare": {
+        "hospitals": 6,
+        "clinics": 110,
+        "pharmacies": 58,
+        "healthCenters": 1
+      },
+      "traffic": {
+        "busRoutes": 32,
+        "accidents": 210,
+        "roadLength": 180
+      },
+      "environment": {
+        "parkArea": 3.5,
+        "greenRatio": 38.2,
+        "airQuality": 38
+      }
+    }
+  },
+  {
+    "id": "hyohaeng",
+    "name": "효행구",
+    "color": "#9B59B6",
+    "policyCount": 23,
+    "stats": {
+      "population": {
+        "total": 200000,
+        "male": 102000,
+        "female": 98000,
+        "children": 38000,
+        "youth": 36000,
+        "young": 48000,
+        "elderly": 42000,
+        "trend": [185000, 190000, 193000, 197000, 200000]
+      },
+      "economy": {
+        "employmentRate": 64.2,
+        "unemploymentRate": 3.8,
+        "grdp": 16.5,
+        "businesses": 9800,
+        "workers": 85000
+      },
+      "education": {
+        "kindergartens": 25,
+        "elementary": 18,
+        "middle": 8,
+        "high": 5,
+        "students": { "elementary": 11000, "middle": 6000, "high": 4200 }
+      },
+      "welfare": {
+        "hospitals": 5,
+        "clinics": 95,
+        "pharmacies": 48,
+        "healthCenters": 1
+      },
+      "traffic": {
+        "busRoutes": 28,
+        "accidents": 185,
+        "roadLength": 165
+      },
+      "environment": {
+        "parkArea": 4.2,
+        "greenRatio": 42.1,
+        "airQuality": 35
+      }
+    }
+  }
+]
