@@ -23,7 +23,7 @@ interface PolicyGridProps {
   onCardClick: (policy: Policy) => void;
 }
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 8;
 
 export default function PolicyGrid({ policies, activeFilter, onCardClick }: PolicyGridProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -59,7 +59,7 @@ export default function PolicyGrid({ policies, activeFilter, onCardClick }: Poli
   return (
     <div>
       {/* 그리드 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         <AnimatePresence mode="popLayout">
           {visible.map((policy, i) => (
             <motion.div

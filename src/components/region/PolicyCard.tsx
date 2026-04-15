@@ -42,7 +42,7 @@ export default function PolicyCard({ policy, onClick }: PolicyCardProps) {
       onClick={onClick}
     >
       {/* 상단 비주얼 영역 */}
-      <div className="relative h-44 overflow-hidden">
+      <div className="relative h-24 sm:h-32 overflow-hidden">
         {/* 그라데이션 배경 */}
         <div
           className="absolute inset-0 transition-all duration-500"
@@ -67,9 +67,9 @@ export default function PolicyCard({ policy, onClick }: PolicyCardProps) {
         </div>
 
         {/* 번호: 좌상단 */}
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black shadow-lg text-white"
+            className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-[10px] sm:text-sm font-black shadow-lg text-white"
             style={{ background: `linear-gradient(135deg, ${catColor} 0%, ${catColor}CC 100%)` }}
           >
             {policy.id}
@@ -77,7 +77,7 @@ export default function PolicyCard({ policy, onClick }: PolicyCardProps) {
         </div>
 
         {/* 카테고리: 우상단 */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 hidden sm:block">
           <CategoryTag category={policy.category as CategoryKey} size="sm" />
         </div>
 
@@ -86,21 +86,18 @@ export default function PolicyCard({ policy, onClick }: PolicyCardProps) {
       </div>
 
       {/* 본문 */}
-      <div className="px-5 pb-5 -mt-3 relative flex flex-col flex-1">
-        <h4 className="text-navy font-extrabold text-base mb-2 line-clamp-2 group-hover:text-orange transition-colors duration-300 leading-snug">
+      <div className="px-3 sm:px-4 pb-3 sm:pb-4 -mt-2 relative flex flex-col flex-1">
+        <h4 className="text-navy font-extrabold text-xs sm:text-sm mb-1 line-clamp-2 group-hover:text-orange transition-colors duration-300 leading-snug">
           {policy.title}
         </h4>
-        <p className="text-navy/40 text-sm line-clamp-2 mb-4 flex-1 leading-relaxed">
+        <p className="text-navy/40 text-[10px] sm:text-xs line-clamp-2 mb-2 flex-1 leading-relaxed">
           {policy.summary}
         </p>
 
-        {/* 하단: 구분선 + 좋아요 */}
-        <div className="pt-3 border-t border-navy/[0.06] flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: catColor }} />
-            <span className="text-navy/25 text-xs font-bold uppercase tracking-wider">
-              {policy.category}
-            </span>
+            <span className="text-navy/20 text-[10px] font-bold uppercase">{policy.category}</span>
           </div>
           <div onClick={(e) => e.stopPropagation()}>
             <LikeButton policyId={policy.id} size="sm" />

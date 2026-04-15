@@ -30,13 +30,13 @@ export default function Navbar() {
       <div className="glass border-b border-navy-100/30">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* ── 로고: 화성특례시 공식 BI ── */}
-          <Link href="/main" className="shrink-0" style={{ marginLeft: '-160px' }}>
+          <Link href="/main" className="shrink-0" style={{ marginLeft: '-40px' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/hwaseong-logo.png`}
               alt="화성특례시"
               className="w-auto object-contain"
-              style={{ height: '220px' }}
+              style={{ height: '140px' }}
             />
           </Link>
 
