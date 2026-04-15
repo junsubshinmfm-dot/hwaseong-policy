@@ -21,6 +21,49 @@ export default function MainPage() {
 
       <div className="relative z-10 pt-16 md:pt-20">
 
+        {/* PC 전용: 브랜드 배너 */}
+        <div className="hidden lg:block mx-8 xl:mx-12 mb-6 relative overflow-hidden rounded-2xl"
+          style={{ background: 'linear-gradient(135deg, #1A3B8F 0%, #152F73 50%, #0D1F4D 100%)' }}>
+          {/* 기하학 장식 */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-[4px] border-white/[0.06]" />
+          <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full border-[4px] border-orange/10" />
+          <div className="absolute top-4 right-20 w-10 h-10 rounded-xl bg-orange/10" />
+          <div className="absolute bottom-3 right-40 w-6 h-6 rounded-full bg-white/[0.04]" />
+          {/* 동심원호 */}
+          <svg className="absolute right-8 top-1/2 -translate-y-1/2 w-32 h-32 opacity-[0.08]" viewBox="0 0 100 100" fill="none">
+            <path d="M50 10 A40 40 0 0 1 90 50" stroke="#F58220" strokeWidth="3" strokeLinecap="round" />
+            <path d="M50 20 A30 30 0 0 1 80 50" stroke="#F58220" strokeWidth="3" strokeLinecap="round" />
+            <path d="M50 30 A20 20 0 0 1 70 50" stroke="white" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+
+          <div className="relative flex items-center justify-between px-8 py-5">
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/15">
+                <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
+                  <path d="M10 38 A20 20 0 0 1 30 18" stroke="#F58220" strokeWidth="4" strokeLinecap="round" />
+                  <path d="M10 38 A12 12 0 0 1 22 26" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
+                  <rect x="30" y="10" width="10" height="10" rx="2.5" fill="#F58220" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-white font-black text-xl">정명근</h2>
+                <p className="text-orange-light font-bold text-sm">&ldquo;100가지 약속, 화성의 미래&rdquo;</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="text-right">
+                <span className="text-orange text-4xl font-black">{20}</span>
+                <span className="text-white/50 text-sm ml-1">개 공약</span>
+              </div>
+              <div className="w-px h-10 bg-white/10" />
+              <div className="text-white/40 text-xs leading-relaxed">
+                <p>화성특례시장 후보</p>
+                <p className="text-orange/60 font-bold">HWASEONG SPECIAL CITY</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 모바일 전용: 프로필 배너 */}
         <div className="lg:hidden">
           <ProfileBanner />

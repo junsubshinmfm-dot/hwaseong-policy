@@ -21,24 +21,9 @@ export default function ShareButtons({ title, description, url, direction = 'row
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleKakaoShare = async () => {
-    const { shareToKakao } = await import('@/lib/share');
-    shareToKakao(title, description, '', url);
-  };
-
   const handleNativeShare = async () => {
     const { shareNative } = await import('@/lib/share');
     await shareNative(title, description, url);
-  };
-
-  const handleTwitterShare = () => {
-    const text = encodeURIComponent(`${title} - ${description}`);
-    const shareUrl = encodeURIComponent(url);
-    window.open(
-      `https://twitter.com/intent/tweet?text=${text}&url=${shareUrl}`,
-      '_blank',
-      'width=550,height=420'
-    );
   };
 
   const handleFacebookShare = () => {
