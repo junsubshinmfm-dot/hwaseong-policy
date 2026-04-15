@@ -28,7 +28,7 @@ export default function MainPage() {
           <ProfileBanner />
         </div>
 
-        <div className="min-h-screen flex flex-col lg:flex-row">
+        <div className="flex flex-col lg:flex-row lg:min-h-screen">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -50,7 +50,7 @@ export default function MainPage() {
         </div>
 
         {/* 모바일 전용: 분야별 공약 바차트 */}
-        <div className="lg:hidden px-3 sm:px-4 pb-6">
+        <div className="lg:hidden px-3 sm:px-4 pb-6 -mt-4">
           <CategoryChart />
         </div>
       </div>
@@ -59,7 +59,7 @@ export default function MainPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="relative z-10 text-center text-navy/30 text-sm font-medium pb-6 -mt-4"
+        className="relative z-10 text-center text-navy/30 text-sm font-medium pb-4 -mt-6 lg:-mt-4"
       >
         미니어처를 클릭하면 해당 권역의 공약을 볼 수 있습니다
       </motion.p>
