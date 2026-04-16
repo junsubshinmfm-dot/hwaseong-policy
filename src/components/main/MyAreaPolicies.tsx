@@ -7,32 +7,59 @@ import { REGIONS, CATEGORIES, type RegionKey, type CategoryKey } from '@/data/ca
 import policiesData from '@/data/policies.json';
 
 /**
- * 각 구청 소재지 + 관할 읍면동 중심 좌표 (Mapcarta/경기도 공공데이터 기반)
- * 만세구: 향남읍 (우정·향남·남양·마도·송산·서신·팔탄·장안·양감·새솔동)
- * 효행구: 봉담읍 (봉담·매송·비봉·정남·기배동)
- * 병점구: 병점동 (진안·병점1·2·반월·화산동)
- * 동탄구: 동탄   (동탄1~9동)
+ * 각 권역의 관할 읍면동 대표 좌표 (다중 포인트 매칭)
+ * 하나의 중심점이 아니라 관할 지역 여러 곳의 좌표로 판단
  */
-const REGION_CENTERS: Record<RegionKey, { lat: number; lng: number }> = {
-  manse:      { lat: 37.138, lng: 126.925 },
-  hyohaeng:   { lat: 37.185, lng: 126.933 },
-  byeongjeom: { lat: 37.207, lng: 127.042 },
-  dongtan:    { lat: 37.187, lng: 127.098 },
+const REGION_POINTS: Record<RegionKey, { lat: number; lng: number }[]> = {
+  // 만세구: 향남읍, 남양읍, 우정읍, 마도면, 송산면, 서신면, 팔탄면, 장안면, 양감면
+  manse: [
+    { lat: 37.138, lng: 126.925 },  // 향남읍
+    { lat: 37.210, lng: 126.822 },  // 남양읍
+    { lat: 37.098, lng: 126.844 },  // 우정읍
+    { lat: 37.154, lng: 126.790 },  // 마도면
+    { lat: 37.200, lng: 126.730 },  // 송산면
+    { lat: 37.170, lng: 126.690 },  // 서신면
+    { lat: 37.110, lng: 126.950 },  // 팔탄면
+    { lat: 37.060, lng: 126.880 },  // 장안면
+    { lat: 37.080, lng: 126.970 },  // 양감면
+  ],
+  // 효행구: 봉담읍, 매송면, 비봉면, 정남면
+  hyohaeng: [
+    { lat: 37.185, lng: 126.933 },  // 봉담읍
+    { lat: 37.220, lng: 126.960 },  // 매송면
+    { lat: 37.248, lng: 126.885 },  // 비봉면
+    { lat: 37.145, lng: 126.985 },  // 정남면
+  ],
+  // 병점구: 병점동, 진안동, 반월동, 화산동
+  byeongjeom: [
+    { lat: 37.207, lng: 127.042 },  // 병점동
+    { lat: 37.215, lng: 127.058 },  // 진안동
+    { lat: 37.230, lng: 127.020 },  // 반월동
+    { lat: 37.195, lng: 127.020 },  // 화산동
+  ],
+  // 동탄구: 동탄1~9동
+  dongtan: [
+    { lat: 37.187, lng: 127.098 },  // 동탄 중심
+    { lat: 37.200, lng: 127.080 },  // 동탄1신도시
+    { lat: 37.175, lng: 127.110 },  // 동탄2신도시 서쪽
+    { lat: 37.165, lng: 127.130 },  // 동탄2신도시 동쪽
+    { lat: 37.195, lng: 127.120 },  // 동탄 북동
+  ],
 };
 
-// 화성시 대략적 경계 (이 범위 밖이면 화성시 외 지역)
 const HWASEONG_BOUNDS = {
-  latMin: 37.05, latMax: 37.30,
-  lngMin: 126.65, lngMax: 127.15,
+  latMin: 37.03, latMax: 37.30,
+  lngMin: 126.65, lngMax: 127.18,
 };
 
-/** 위도/경도 보정된 거리 계산 (km 근사치) */
-function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const LAT_KM = 111.0;  // 위도 1도 ≈ 111km
-  const LNG_KM = 88.8;   // 한국(37도) 기준 경도 1도 ≈ 88.8km
-  const dLat = (lat1 - lat2) * LAT_KM;
-  const dLng = (lng1 - lng2) * LNG_KM;
-  return Math.sqrt(dLat * dLat + dLng * dLng);
+/** Haversine 공식으로 정확한 거리 계산 (km) */
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function isInHwaseong(lat: number, lng: number): boolean {
@@ -40,19 +67,22 @@ function isInHwaseong(lat: number, lng: number): boolean {
     && lng >= HWASEONG_BOUNDS.lngMin && lng <= HWASEONG_BOUNDS.lngMax;
 }
 
+/** 다중 포인트 중 가장 가까운 포인트로 권역 판단 */
 function findClosestRegion(lat: number, lng: number): { region: RegionKey; distance: number } {
   let closest: RegionKey = 'dongtan';
   let minDist = Infinity;
 
-  (Object.entries(REGION_CENTERS) as [RegionKey, { lat: number; lng: number }][]).forEach(([id, center]) => {
-    const dist = distanceKm(lat, lng, center.lat, center.lng);
-    if (dist < minDist) {
-      minDist = dist;
-      closest = id;
+  (Object.entries(REGION_POINTS) as [RegionKey, { lat: number; lng: number }[]][]).forEach(([id, points]) => {
+    for (const pt of points) {
+      const dist = haversineKm(lat, lng, pt.lat, pt.lng);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = id;
+      }
     }
   });
 
-  return { region: closest, distance: minDist };
+  return { region: closest, distance: Math.round(minDist * 10) / 10 };
 }
 
 export default function MyAreaPolicies() {
@@ -68,28 +98,31 @@ export default function MyAreaPolicies() {
     }
 
     setStatus('loading');
+
+    // 먼저 빠른 결과, 그 후 정확한 결과로 갱신
+    const handlePosition = (pos: GeolocationPosition) => {
+      const { latitude, longitude } = pos.coords;
+      const result = findClosestRegion(latitude, longitude);
+      setRegion(result.region);
+      setDistance(result.distance);
+      setStatus(isInHwaseong(latitude, longitude) ? 'found' : 'outside');
+    };
+
+    // 1차: 빠른 위치 (캐시 허용)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude, longitude } = pos.coords;
-
-        if (!isInHwaseong(latitude, longitude)) {
-          // 화성시 밖이지만 가장 가까운 권역은 표시
-          const result = findClosestRegion(latitude, longitude);
-          setRegion(result.region);
-          setDistance(Math.round(result.distance));
-          setStatus('outside');
-          return;
-        }
-
-        const result = findClosestRegion(latitude, longitude);
-        setRegion(result.region);
-        setDistance(Math.round(result.distance * 10) / 10);
-        setStatus('found');
+        handlePosition(pos);
+        // 2차: 정확한 위치 (GPS 강제)
+        navigator.geolocation.getCurrentPosition(
+          handlePosition,
+          () => {}, // 실패해도 1차 결과 유지
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
       },
       (err) => {
         setStatus(err.code === 1 ? 'denied' : 'error');
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     );
   };
 
@@ -154,7 +187,6 @@ export default function MyAreaPolicies() {
     );
   }
 
-  // found 또는 outside
   return (
     <div className="brand-card p-4">
       <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -165,7 +197,6 @@ export default function MyAreaPolicies() {
         우리동네 공약
       </h3>
 
-      {/* 화성시 외 지역 안내 */}
       {status === 'outside' && (
         <div className="mb-3 px-3 py-2 rounded-lg bg-orange/10 text-orange text-xs font-medium">
           현재 화성시 밖에 계십니다 (약 {distance}km). 가장 가까운 권역을 표시합니다.
@@ -177,7 +208,7 @@ export default function MyAreaPolicies() {
           <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: regionMeta.color }} />
           <span className="text-navy font-extrabold text-sm">{regionMeta.label}</span>
           {status === 'found' && (
-            <span className="text-navy/30 text-xs">내 위치 기준 ({distance}km)</span>
+            <span className="text-navy/30 text-xs">내 위치에서 {distance}km</span>
           )}
         </div>
       )}
