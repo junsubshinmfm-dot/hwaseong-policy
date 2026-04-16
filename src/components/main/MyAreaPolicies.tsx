@@ -11,10 +11,10 @@ import policiesData from '@/data/policies.json';
  * GPS 좌표로 어느 권역에 가까운지 판단
  */
 const REGION_CENTERS: Record<RegionKey, { lat: number; lng: number }> = {
-  manse:      { lat: 37.15, lng: 126.72 },  // 서쪽
-  hyohaeng:   { lat: 37.22, lng: 126.82 },  // 북쪽
-  byeongjeom: { lat: 37.23, lng: 126.92 },  // 북동쪽
-  dongtan:    { lat: 37.17, lng: 126.95 },  // 동쪽/남동쪽
+  manse:      { lat: 37.13, lng: 126.73 },  // 1권역: 서쪽 (남양/마도/송산)
+  hyohaeng:   { lat: 37.21, lng: 126.81 },  // 2권역: 중북부 (봉담/효행)
+  byeongjeom: { lat: 37.24, lng: 126.90 },  // 3권역: 북동 (병점/진안)
+  dongtan:    { lat: 37.20, lng: 127.07 },  // 4권역: 동쪽 (동탄1·2신도시)
 };
 
 function findClosestRegion(lat: number, lng: number): RegionKey {
