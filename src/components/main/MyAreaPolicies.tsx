@@ -10,11 +10,18 @@ import policiesData from '@/data/policies.json';
  * 화성시 4개 권역의 대략적 경계 (위도/경도)
  * GPS 좌표로 어느 권역에 가까운지 판단
  */
+/**
+ * 각 구청 소재지 + 관할 읍면동 중심 좌표 (Mapcarta/경기도 공공데이터 기반)
+ * 만세구: 향남읍 37.138, 126.925 (우정·향남·남양·마도·송산·서신·팔탄·장안·양감)
+ * 효행구: 봉담읍 37.185, 126.933 (봉담·매송·비봉·정남·기배동)
+ * 병점구: 병점동 37.207, 127.042 (진안·병점1·2·반월·화산동)
+ * 동탄구: 동탄   37.187, 127.098 (동탄1~9동)
+ */
 const REGION_CENTERS: Record<RegionKey, { lat: number; lng: number }> = {
-  manse:      { lat: 37.13, lng: 126.73 },  // 1권역: 서쪽 (남양/마도/송산)
-  hyohaeng:   { lat: 37.21, lng: 126.81 },  // 2권역: 중북부 (봉담/효행)
-  byeongjeom: { lat: 37.24, lng: 126.90 },  // 3권역: 북동 (병점/진안)
-  dongtan:    { lat: 37.20, lng: 127.07 },  // 4권역: 동쪽 (동탄1·2신도시)
+  manse:      { lat: 37.138, lng: 126.925 },
+  hyohaeng:   { lat: 37.185, lng: 126.933 },
+  byeongjeom: { lat: 37.207, lng: 127.042 },
+  dongtan:    { lat: 37.187, lng: 127.098 },
 };
 
 function findClosestRegion(lat: number, lng: number): RegionKey {
