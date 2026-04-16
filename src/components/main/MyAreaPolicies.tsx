@@ -99,7 +99,6 @@ export default function MyAreaPolicies() {
 
     setStatus('loading');
 
-    // 먼저 빠른 결과, 그 후 정확한 결과로 갱신
     const handlePosition = (pos: GeolocationPosition) => {
       const { latitude, longitude } = pos.coords;
       const result = findClosestRegion(latitude, longitude);
@@ -108,21 +107,26 @@ export default function MyAreaPolicies() {
       setStatus(isInHwaseong(latitude, longitude) ? 'found' : 'outside');
     };
 
-    // 1차: 빠른 위치 (캐시 허용)
+    const handleError = (err: GeolocationPositionError) => {
+      if (err.code === 1) {
+        setStatus('denied');
+      } else {
+        setStatus('error');
+      }
+    };
+
+    // 모바일에서는 highAccuracy가 느릴 수 있으므로 먼저 빠른 결과 시도
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        handlePosition(pos);
-        // 2차: 정확한 위치 (GPS 강제)
+      handlePosition,
+      () => {
+        // 빠른 결과 실패 시 → 정밀 GPS로 재시도
         navigator.geolocation.getCurrentPosition(
           handlePosition,
-          () => {}, // 실패해도 1차 결과 유지
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+          handleError,
+          { enableHighAccuracy: true, timeout: 30000, maximumAge: 300000 }
         );
       },
-      (err) => {
-        setStatus(err.code === 1 ? 'denied' : 'error');
-      },
-      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
     );
   };
 
