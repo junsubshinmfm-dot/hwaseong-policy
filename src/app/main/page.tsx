@@ -7,6 +7,8 @@ import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
 import ProfileBanner from '@/components/main/ProfileBanner';
 import CategoryChart from '@/components/main/CategoryChart';
+import PolicyRanking from '@/components/main/PolicyRanking';
+import MyAreaPolicies from '@/components/main/MyAreaPolicies';
 
 export default function MainPage() {
   return (
@@ -36,8 +38,10 @@ export default function MainPage() {
           >
             <MiniatureMap />
 
-            {/* 모바일: 지도 바로 아래 분야별 공약 */}
-            <div className="lg:hidden mt-3">
+            {/* 모바일: 지도 바로 아래 */}
+            <div className="lg:hidden mt-3 space-y-3">
+              <MyAreaPolicies />
+              <PolicyRanking />
               <CategoryChart />
             </div>
           </motion.div>

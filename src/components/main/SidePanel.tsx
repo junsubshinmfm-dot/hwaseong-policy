@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { CATEGORIES, type CategoryKey } from '@/data/categories';
 import policiesData from '@/data/policies.json';
+import PolicyRanking from './PolicyRanking';
+import MyAreaPolicies from './MyAreaPolicies';
 
 export default function SidePanel() {
   const categoryStats = useMemo(() => {
@@ -93,6 +95,12 @@ export default function SidePanel() {
           ))}
         </div>
       </div>
+
+      {/* 인기 공약 랭킹 */}
+      <PolicyRanking />
+
+      {/* 우리동네 공약 */}
+      <MyAreaPolicies />
     </div>
   );
 }
