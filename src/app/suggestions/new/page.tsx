@@ -58,8 +58,19 @@ export default function NewSuggestionPage() {
         .filter(Boolean)
         .join('\n');
 
-      const isApproved = moderateContent(fullText);
-      const status = isApproved ? 'approved' : 'pending';
+      const moderation = moderateContent(fullText);
+
+      // 1. 차단된 단어 포함 시 즉시 거부
+      if (moderation === 'blocked') {
+        setResult({
+          status: 'error',
+          message: '부적절한 표현(욕설, 비속어, 혐오 표현 등)이 포함되어 등록할 수 없습니다. 내용을 수정해주세요.',
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      const status: 'approved' | 'pending' = moderation === 'pending' ? 'pending' : 'approved';
 
       const id = await submitSuggestion(
         {
@@ -84,9 +95,9 @@ export default function NewSuggestionPage() {
 
       setResult({
         status,
-        message: isApproved
+        message: status === 'approved'
           ? '정책 제안이 등록되었습니다!'
-          : '제안이 접수되었습니다. 검토 후 게시됩니다.',
+          : '제안이 접수되었습니다. 내용 검토 후 게시됩니다.',
       });
     } catch (err) {
       console.error('제안 제출 오류:', err);
@@ -389,15 +400,15 @@ export default function NewSuggestionPage() {
                     <div className="flex gap-2">
                       <span className="shrink-0 w-16 font-bold text-navy/70">④ 거부 권리</span>
                       <span className="leading-relaxed">
-                        정보 주체는 동의를 거부할 권리가 있습니다. 다만 거부 시 제안하신 공약이 선정되어도
-                        <b className="text-orange"> 연락드리기 어려울 수 있습니다.</b> 아무쪼록 동의를 부탁드립니다.
+                        동의를 거부할 권리가 누구에게나 있으며, 동의 하에 수집된 정보는 <b className="text-navy">운영자만 열람</b>하며 외부에 공개되지 않습니다.
+                        다만 거부 시 제안하신 공약이 선정되어도 <b className="text-orange">연락드리기 어려울 수 있습니다.</b> 아무쪼록 동의를 부탁드립니다.
                       </span>
                     </div>
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-white/60 border border-navy/[0.04] mb-3">
                     <p className="text-navy/50 text-[11px] leading-relaxed">
-                      🔒 수집된 정보는 <b>운영자만 열람</b>하며, 제3자에게 제공·공개하지 않습니다. 정보주체는 언제든지 연락하여 열람·정정·삭제를 요청할 수 있습니다.
+                      🔒 정보주체는 언제든지 연락하여 열람·정정·삭제를 요청할 수 있으며, 제3자에게 제공·공개하지 않습니다.
                     </p>
                   </div>
 

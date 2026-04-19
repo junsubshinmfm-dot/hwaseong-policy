@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { subscribeComments, submitComment, deleteComment } from '@/lib/comments';
+import { moderateContent } from '@/lib/moderation';
 import type { Comment } from '@/types/suggestion';
 
 interface CommentSectionProps {
@@ -34,6 +35,13 @@ export default function CommentSection({ suggestionId }: CommentSectionProps) {
     }
     if (password.trim().length < 4) {
       setError('비밀번호는 4자 이상 입력해주세요');
+      return;
+    }
+
+    // 욕설/19금/혐오 표현 차단
+    const moderation = moderateContent(`${nickname.trim()}\n${content.trim()}`);
+    if (moderation === 'blocked') {
+      setError('부적절한 표현이 포함되어 등록할 수 없습니다');
       return;
     }
 
