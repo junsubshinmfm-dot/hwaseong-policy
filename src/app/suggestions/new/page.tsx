@@ -384,32 +384,27 @@ export default function NewSuggestionPage() {
                 <div className="p-4 rounded-xl bg-navy-50/50 border border-navy/[0.06]">
                   <p className="font-bold text-navy text-sm mb-3">[개인정보 수집 및 이용 동의]</p>
 
-                  <div className="text-navy/60 text-xs leading-relaxed space-y-2 mb-3">
-                    <div className="flex gap-2">
-                      <span className="shrink-0 w-16 font-bold text-navy/70">① 수집 항목</span>
-                      <span>이름, 전화번호</span>
+                  <div className="text-navy/70 text-xs leading-relaxed space-y-3 mb-3">
+                    <div>
+                      <p className="font-bold text-navy/80 mb-0.5">① 수집 항목</p>
+                      <p>이름, 전화번호</p>
                     </div>
-                    <div className="flex gap-2">
-                      <span className="shrink-0 w-16 font-bold text-navy/70">② 수집 목적</span>
-                      <span>제안하신 정책에 대한 피드백 안내 및 공약 반영 시 연락</span>
+                    <div>
+                      <p className="font-bold text-navy/80 mb-0.5">② 수집 목적</p>
+                      <p>제안하신 정책에 대한 자세한 피드백을 듣기 및 공약 반영 시 연락 목적</p>
                     </div>
-                    <div className="flex gap-2">
-                      <span className="shrink-0 w-16 font-bold text-navy/70">③ 보유 기간</span>
-                      <span>제8회 전국동시지방선거 종료 후 6개월 이내 즉시 파기</span>
+                    <div>
+                      <p className="font-bold text-navy/80 mb-0.5">③ 보유 기간</p>
+                      <p>제9회 전국동시지방선거 종료 후 3개월 이내 즉시 파기</p>
                     </div>
-                    <div className="flex gap-2">
-                      <span className="shrink-0 w-16 font-bold text-navy/70">④ 거부 권리</span>
-                      <span className="leading-relaxed">
-                        동의를 거부할 권리가 누구에게나 있으며, 동의 하에 수집된 정보는 <b className="text-navy">운영자만 열람</b>하며 외부에 공개되지 않습니다.
-                        다만 거부 시 제안하신 공약이 선정되어도 <b className="text-orange">연락드리기 어려울 수 있습니다.</b> 아무쪼록 동의를 부탁드립니다.
-                      </span>
+                    <div>
+                      <p className="font-bold text-navy/80 mb-0.5">④ 거부 권리</p>
+                      <p>동의를 거부할 권리가 누구에게나 있으며, 동의 하에 수집된 정보는 <b className="text-navy">운영자만 열람</b>하며 외부에 공개되지 않습니다. 다만 거부 시 제안하신 공약이 선정되어도 <b className="text-orange">연락드리기 어려울 수 있습니다.</b> 아무쪼록 동의를 부탁드립니다.</p>
                     </div>
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-white/60 border border-navy/[0.04] mb-3">
-                    <p className="text-navy/50 text-[11px] leading-relaxed">
-                      🔒 정보주체는 언제든지 연락하여 열람·정정·삭제를 요청할 수 있으며, 제3자에게 제공·공개하지 않습니다.
-                    </p>
+                    <p className="text-navy/50 text-[11px] leading-relaxed">🔒 정보주체는 언제든지 연락하여 열람·정정·삭제를 요청할 수 있으며, 제3자에게 제공·공개하지 않습니다.</p>
                   </div>
 
                   <label className="flex items-center gap-2 cursor-pointer">
