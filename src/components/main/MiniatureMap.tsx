@@ -293,7 +293,8 @@ export default function MiniatureMap() {
                 </div>
 
                 {/* 카드 캐러셀 — 드래그 + 5개 보임 (양끝 잘림) */}
-                <div className="relative z-10 flex-1 flex items-center overflow-hidden">
+                <div className="relative z-10 flex-1 flex items-center overflow-hidden"
+                  onClick={(e) => { if (e.target === e.currentTarget) setSelected(null); }}>
                   <div ref={scrollRef}
                     className="flex gap-2 sm:gap-3 overflow-x-auto py-1 sm:py-2 scrollbar-hide items-center w-full cursor-grab select-none"
                     style={{ height: 'clamp(200px, 55%, 600px)', paddingLeft: '8%', paddingRight: '8%' }}
@@ -340,7 +341,7 @@ export default function MiniatureMap() {
                             style={{ cursor: 'pointer' }}
                             onClick={() => {
                               if (dragMoved.current) return;
-                              router.push(`/suggestions`);
+                              router.push(`/region/${selected}`);
                             }}
                           >
                             <div className="h-2 flex shrink-0">
@@ -380,9 +381,11 @@ export default function MiniatureMap() {
                     })}
                   </div>
 
-                  {/* 좌우 잘림 페이드 */}
-                  <div className="absolute top-0 left-0 bottom-0 w-[8%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none z-[1]" />
-                  <div className="absolute top-0 right-0 bottom-0 w-[8%] bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-[1]" />
+                  {/* 좌우 잘림 페이드 — 클릭하면 닫기 */}
+                  <div className="absolute top-0 left-0 bottom-0 w-[8%] bg-gradient-to-r from-black/60 to-transparent z-[1] cursor-pointer"
+                    onClick={() => setSelected(null)} />
+                  <div className="absolute top-0 right-0 bottom-0 w-[8%] bg-gradient-to-l from-black/60 to-transparent z-[1] cursor-pointer"
+                    onClick={() => setSelected(null)} />
                 </div>
 
                 {/* 좌우 버튼 */}

@@ -67,6 +67,7 @@ export default function ReportButton({ suggestionId, size = 'sm' }: ReportButton
       <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2z" />
       </svg>
+      <span>신고</span>
     </button>
   );
 }
