@@ -50,7 +50,7 @@ export default function PolicyRanking() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                onClick={() => router.push(`/suggestions`)}
+                onClick={() => router.push(`/region/${suggestion.region}?suggestion=${suggestion.id}`)}
                 className="flex items-center gap-2.5 p-2 rounded-xl cursor-pointer hover:bg-navy-50 transition-colors"
               >
                 <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${

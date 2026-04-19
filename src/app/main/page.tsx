@@ -9,10 +9,12 @@ import ProfileBanner from '@/components/main/ProfileBanner';
 import CategoryChart from '@/components/main/CategoryChart';
 import PolicyRanking from '@/components/main/PolicyRanking';
 import MyAreaPolicies from '@/components/main/MyAreaPolicies';
+import WelcomePopup from '@/components/shared/WelcomePopup';
 
 export default function MainPage() {
   return (
     <main className="min-h-screen bg-[var(--background)] relative overflow-hidden">
+      <WelcomePopup />
       <Navbar />
 
       <div className="absolute top-16 left-0 right-0 h-[180px] z-0 hidden md:block">

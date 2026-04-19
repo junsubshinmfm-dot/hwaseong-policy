@@ -121,6 +121,8 @@ export default function AdminPage() {
         reason: uploadForm.reason,
         expectedEffect: uploadForm.expectedEffect,
         nickname: uploadForm.nickname || '관리자',
+        realName: '',
+        phone: '',
         password: '',
         region: uploadForm.region as RegionKey,
         category: uploadForm.category as CategoryKey,
@@ -441,6 +443,33 @@ export default function AdminPage() {
                               ) : (
                                 /* 보기 모드 */
                                 <>
+                                  {/* 개인정보 (관리자 전용) */}
+                                  {(suggestion.realName || suggestion.phone) && (
+                                    <div className="p-3 rounded-xl bg-orange/5 border border-orange/20">
+                                      <p className="text-orange text-[10px] font-bold uppercase mb-2 flex items-center gap-1">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                        개인정보 (관리자 전용)
+                                      </p>
+                                      <div className="grid grid-cols-2 gap-2 text-sm">
+                                        {suggestion.realName && (
+                                          <div>
+                                            <span className="text-navy/40 text-xs">이름: </span>
+                                            <span className="text-navy font-bold">{suggestion.realName}</span>
+                                          </div>
+                                        )}
+                                        {suggestion.phone && (
+                                          <div>
+                                            <span className="text-navy/40 text-xs">전화: </span>
+                                            <a href={`tel:${suggestion.phone}`} className="text-navy font-bold hover:text-orange transition-colors">
+                                              {suggestion.phone}
+                                            </a>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
                                   <div>
                                     <p className="text-navy/40 text-xs font-bold uppercase mb-1">정책 내용</p>
                                     <p className="text-navy text-sm leading-relaxed whitespace-pre-wrap">{suggestion.content}</p>

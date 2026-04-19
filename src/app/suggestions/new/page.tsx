@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CATEGORIES, REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
-import { useGeoLocation } from '@/hooks/useGeoLocation';
 import { submitSuggestion } from '@/lib/suggestions';
 import { moderateContent } from '@/lib/moderation';
 import Navbar from '@/components/shared/Navbar';
@@ -15,51 +14,41 @@ const regionEntries = Object.entries(REGIONS) as [RegionKey, (typeof REGIONS)[Re
 
 export default function NewSuggestionPage() {
   const router = useRouter();
-  const { status: geoStatus, closestRegion, requestLocation } = useGeoLocation();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [reason, setReason] = useState('');
   const [expectedEffect, setExpectedEffect] = useState('');
   const [nickname, setNickname] = useState('');
+  const [realName, setRealName] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [region, setRegion] = useState<RegionKey | ''>('');
   const [category, setCategory] = useState<CategoryKey | ''>('');
+  const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ status: string; message: string } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // GPS가 잡히면 지역 자동 설정
-  const handleGeoClick = () => {
-    requestLocation();
-  };
-
-  // GPS 결과 반영
-  if (geoStatus === 'in_hwaseong' && closestRegion && !region) {
-    setRegion(closestRegion);
-  }
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!title.trim()) newErrors.title = '제목을 입력해주세요';
     if (!content.trim()) newErrors.content = '정책 내용을 입력해주세요';
     if (!nickname.trim()) newErrors.nickname = '닉네임을 입력해주세요';
+    if (!realName.trim()) newErrors.realName = '이름을 입력해주세요';
+    if (!phone.trim()) newErrors.phone = '전화번호를 입력해주세요';
+    if (phone.trim() && !/^[0-9-]+$/.test(phone.trim())) newErrors.phone = '숫자와 - 만 입력 가능합니다';
     if (!password.trim()) newErrors.password = '비밀번호를 입력해주세요';
-    if (password.trim().length < 4) newErrors.password = '비밀번호는 4자 이상 입력해주세요';
+    if (password.trim() && password.trim().length < 4) newErrors.password = '비밀번호는 4자 이상 입력해주세요';
     if (!region) newErrors.region = '지역을 선택해주세요';
     if (!category) newErrors.category = '카테고리를 선택해주세요';
+    if (!consent) newErrors.consent = '개인정보 수집에 동의해주세요';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
     if (!validate()) return;
-
-    // GPS: 화성시 여부만 확인 (확인 안 했으면 안내)
-    if (geoStatus === 'idle' || geoStatus === 'loading') {
-      setErrors({ geo: '위치 확인 버튼을 눌러주세요.' });
-      return;
-    }
 
     setSubmitting(true);
     setResult(null);
@@ -79,6 +68,8 @@ export default function NewSuggestionPage() {
           reason: reason.trim(),
           expectedEffect: expectedEffect.trim(),
           nickname: nickname.trim(),
+          realName: realName.trim(),
+          phone: phone.trim(),
           password: password.trim(),
           region: region as RegionKey,
           category: category as CategoryKey,
@@ -131,21 +122,18 @@ export default function NewSuggestionPage() {
                 내용 검토 후 게시됩니다. 잠시만 기다려주세요.
               </p>
             )}
-            <div className="flex gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
-                onClick={() => router.push('/suggestions')}
+                onClick={() => router.push('/main')}
                 className="px-6 py-3 rounded-xl bg-navy text-white font-bold hover:bg-navy-dark transition-colors"
               >
-                제안 목록 보기
+                메인으로
               </button>
               <button
                 onClick={() => {
                   setResult(null);
-                  setTitle('');
-                  setContent('');
-                  setReason('');
-                  setExpectedEffect('');
-                  setPassword('');
+                  setTitle(''); setContent(''); setReason(''); setExpectedEffect('');
+                  setPassword(''); setRealName(''); setPhone(''); setConsent(false);
                 }}
                 className="px-6 py-3 rounded-xl border border-navy/10 text-navy font-bold hover:bg-navy-50 transition-colors"
               >
@@ -175,9 +163,9 @@ export default function NewSuggestionPage() {
           <div className="w-32 bg-orange" />
         </div>
 
-        <div className="relative z-10 px-4 md:px-8 max-w-4xl mx-auto pt-10 pb-8">
+        <div className="relative z-10 px-4 md:px-8 max-w-4xl mx-auto pt-8 pb-6">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex items-start gap-5">
+            <div className="flex items-start gap-4">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden shrink-0"
                 style={{ background: 'linear-gradient(135deg, #F58220 0%, #F58220BB 100%)', boxShadow: '0 8px 32px #F5822040' }}>
                 <div className="absolute inset-0 bg-white/[0.08]" />
@@ -202,58 +190,6 @@ export default function NewSuggestionPage() {
           transition={{ delay: 0.1 }}
           className="bg-white rounded-2xl shadow-lg border border-navy/[0.06] overflow-hidden"
         >
-          {/* GPS 위치 확인 */}
-          <div className="p-4 sm:p-6 border-b border-navy/[0.06]">
-            <h3 className="text-navy font-bold text-base mb-3 flex items-center gap-2">
-              <svg className="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              위치 확인
-              <span className="text-orange text-xs font-medium">(필수)</span>
-            </h3>
-
-            {geoStatus === 'idle' && (
-              <button
-                onClick={handleGeoClick}
-                className="w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-navy to-navy-light hover:shadow-lg hover:scale-[1.01] transition-all"
-              >
-                내 위치 확인하기
-              </button>
-            )}
-            {geoStatus === 'loading' && (
-              <div className="flex items-center justify-center py-3 gap-2">
-                <div className="w-4 h-4 border-2 border-navy/20 border-t-navy rounded-full animate-spin" />
-                <span className="text-navy/50 text-sm">위치 확인 중...</span>
-              </div>
-            )}
-            {geoStatus === 'in_hwaseong' && (
-              <div className="flex items-center gap-2 py-2 px-4 rounded-xl bg-green-50 text-green-700">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-sm font-bold">화성시 위치 확인 완료</span>
-              </div>
-            )}
-            {geoStatus === 'outside' && (
-              <div className="flex items-center gap-2 py-2 px-4 rounded-xl bg-orange/10 text-orange">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm font-bold">화성시 외 지역입니다</span>
-              </div>
-            )}
-            {(geoStatus === 'denied' || geoStatus === 'error') && (
-              <div className="space-y-2">
-                <div className="py-2 px-4 rounded-xl bg-orange/10 text-orange text-sm font-medium">
-                  {geoStatus === 'denied' ? '위치 권한이 거부되었습니다.' : '위치를 확인할 수 없습니다.'}
-                </div>
-                <button onClick={handleGeoClick} className="text-sm text-navy font-bold underline">다시 시도</button>
-              </div>
-            )}
-            {errors.geo && <p className="text-red-500 text-xs mt-2">{errors.geo}</p>}
-          </div>
-
           <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
             {/* 지역 선택 */}
             <div>
@@ -355,7 +291,7 @@ export default function NewSuggestionPage() {
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="표시될 닉네임을 입력해주세요"
+                placeholder="사이트에 공개될 닉네임"
                 maxLength={20}
                 className="w-full px-4 py-3 rounded-xl border border-navy/10 text-navy text-sm
                            focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange
@@ -383,11 +319,84 @@ export default function NewSuggestionPage() {
               <p className="text-navy/20 text-xs mt-1">본인 제안을 수정/삭제할 때 필요합니다</p>
             </div>
 
+            {/* 개인정보 섹션 */}
+            <div className="pt-4 border-t border-navy/[0.06]">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-4 h-4 text-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <p className="text-navy font-bold text-sm">개인정보 (운영자만 확인)</p>
+              </div>
+              <p className="text-navy/50 text-xs mb-4 leading-relaxed">
+                제안해주신 정책이 좋은 정책으로 판단될 경우, <span className="text-orange font-bold">정명근 예비후보 공약에 반영</span>하여<br className="hidden sm:inline" />
+                직접 연락드리고 반영 내용을 알려드리기 위해 수집합니다.
+              </p>
+
+              <div className="space-y-4">
+                {/* 이름 */}
+                <div>
+                  <label className="block text-navy font-bold text-sm mb-2">
+                    이름 <span className="text-orange">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={realName}
+                    onChange={(e) => setRealName(e.target.value)}
+                    placeholder="실명을 입력해주세요"
+                    maxLength={20}
+                    className="w-full px-4 py-3 rounded-xl border border-navy/10 text-navy text-sm
+                               focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange
+                               placeholder:text-navy/25 transition-all"
+                  />
+                  {errors.realName && <p className="text-red-500 text-xs mt-1">{errors.realName}</p>}
+                </div>
+
+                {/* 전화번호 */}
+                <div>
+                  <label className="block text-navy font-bold text-sm mb-2">
+                    전화번호 <span className="text-orange">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="010-1234-5678"
+                    maxLength={15}
+                    className="w-full px-4 py-3 rounded-xl border border-navy/10 text-navy text-sm
+                               focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange
+                               placeholder:text-navy/25 transition-all"
+                  />
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                </div>
+
+                {/* 개인정보 수집 동의 */}
+                <div className="p-4 rounded-xl bg-navy-50/50 border border-navy/[0.06]">
+                  <div className="text-navy/60 text-xs leading-relaxed mb-3 space-y-1">
+                    <p className="font-bold text-navy">[개인정보 수집 및 이용 동의]</p>
+                    <p>• <b className="text-navy/70">수집 항목:</b> 이름, 전화번호</p>
+                    <p>• <b className="text-navy/70">수집 목적:</b> 제안 정책 반영 시 연락 및 공약 반영 안내</p>
+                    <p>• <b className="text-navy/70">보유 기간:</b> 선거 종료 후 6개월까지</p>
+                    <p>• <b className="text-navy/70">동의 거부 권리:</b> 동의를 거부할 권리가 있으나, 거부 시 제안 등록이 제한됩니다.</p>
+                    <p className="text-navy/40 mt-2">수집된 정보는 운영자만 열람하며 외부에 공개되지 않습니다.</p>
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={(e) => setConsent(e.target.checked)}
+                      className="w-4 h-4 rounded border-navy/30 text-orange focus:ring-orange/30"
+                    />
+                    <span className="text-navy font-bold text-sm">개인정보 수집 및 이용에 동의합니다</span>
+                  </label>
+                  {errors.consent && <p className="text-red-500 text-xs mt-2">{errors.consent}</p>}
+                </div>
+              </div>
+            </div>
+
             {/* 선택 입력 영역 */}
             <div className="pt-4 border-t border-navy/[0.06]">
               <p className="text-navy/30 text-xs font-bold uppercase tracking-wider mb-4">선택 입력</p>
 
-              {/* 필요한 이유 */}
               <div className="mb-4">
                 <label className="block text-navy font-bold text-sm mb-2">필요한 이유</label>
                 <textarea
@@ -403,7 +412,6 @@ export default function NewSuggestionPage() {
                 <p className="text-navy/20 text-xs text-right mt-1">{reason.length}/500</p>
               </div>
 
-              {/* 기대 효과 */}
               <div>
                 <label className="block text-navy font-bold text-sm mb-2">기대 효과</label>
                 <textarea
@@ -420,14 +428,12 @@ export default function NewSuggestionPage() {
               </div>
             </div>
 
-            {/* 제출 에러 */}
             {result?.status === 'error' && (
               <div className="py-3 px-4 rounded-xl bg-red-50 text-red-600 text-sm font-medium">
                 {result.message}
               </div>
             )}
 
-            {/* 제출 버튼 */}
             <button
               onClick={handleSubmit}
               disabled={submitting}

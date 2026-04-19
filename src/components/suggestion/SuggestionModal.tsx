@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import CategoryTag from '@/components/shared/CategoryTag';
 import SuggestionLikeButton from './SuggestionLikeButton';
 import ReportButton from './ReportButton';
+import CommentSection from './CommentSection';
 import { REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
 import type { Suggestion } from '@/types/suggestion';
 
@@ -141,10 +142,15 @@ export default function SuggestionModal({ suggestion, onClose }: SuggestionModal
 
             <div className="h-px bg-navy-100/30 mb-6" />
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-6">
               <ReportButton suggestionId={suggestion.id} size="md" />
               <SuggestionLikeButton suggestionId={suggestion.id} initialLikes={suggestion.likes} size="md" />
             </div>
+
+            <div className="h-px bg-navy-100/30 mb-6" />
+
+            {/* 댓글 섹션 */}
+            <CommentSection suggestionId={suggestion.id} />
           </div>
         </div>
       </motion.div>

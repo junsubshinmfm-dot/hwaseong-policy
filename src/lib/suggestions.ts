@@ -19,6 +19,8 @@ export async function submitSuggestion(
     reason: data.reason || '',
     expectedEffect: data.expectedEffect || '',
     nickname: data.nickname,
+    realName: data.realName || '',
+    phone: data.phone || '',
     region: data.region,
     category: data.category,
     password: data.password || '',
