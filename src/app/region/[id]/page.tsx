@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, Suspense } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { REGIONS, type RegionKey, type CategoryKey } from '@/data/categories';
 import { useRegionData } from '@/hooks/useRegionData';
@@ -29,6 +29,7 @@ export default function RegionPage() {
 function RegionContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const regionId = params.id as RegionKey;
   const regionMeta = REGIONS[regionId];
 
@@ -45,6 +46,15 @@ function RegionContent() {
     });
     return counts;
   }, [suggestions]);
+
+  // URL ?suggestion=xxx 파라미터로 모달 자동 오픈
+  useEffect(() => {
+    const suggestionId = searchParams.get('suggestion');
+    if (suggestionId && suggestions.length > 0) {
+      const found = suggestions.find((s) => s.id === suggestionId);
+      if (found) setSelectedSuggestion(found);
+    }
+  }, [searchParams, suggestions]);
 
   useEffect(() => {
     const handlePopState = () => setSelectedSuggestion(null);

@@ -263,13 +263,14 @@ export default function MiniatureMap() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="absolute inset-0 z-[8] flex flex-col"
+                onClick={() => setSelected(null)}
               >
                 {/* 어두운 배경 */}
-                <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
-                  onClick={() => setSelected(null)} />
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
 
                 {/* 상단 헤더 */}
-                <div className="relative z-10 flex items-center justify-between px-2 sm:px-4 pt-2 sm:pt-4">
+                <div className="relative z-10 flex items-center justify-between px-2 sm:px-4 pt-2 sm:pt-4"
+                  onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center gap-1.5 sm:gap-2.5">
                     <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shadow-lg" style={{ backgroundColor: selectedRegion.color }} />
                     <span className="text-white font-extrabold text-sm sm:text-lg drop-shadow">{selectedRegion.label}</span>
@@ -293,9 +294,9 @@ export default function MiniatureMap() {
                 </div>
 
                 {/* 카드 캐러셀 — 드래그 + 5개 보임 (양끝 잘림) */}
-                <div className="relative z-10 flex-1 flex items-center overflow-hidden"
-                  onClick={(e) => { if (e.target === e.currentTarget) setSelected(null); }}>
+                <div className="relative z-10 flex-1 flex items-center overflow-hidden">
                   <div ref={scrollRef}
+                    onClick={(e) => e.stopPropagation()}
                     className="flex gap-2 sm:gap-3 overflow-x-auto py-1 sm:py-2 scrollbar-hide items-center w-full cursor-grab select-none"
                     style={{ height: 'clamp(200px, 55%, 600px)', paddingLeft: '8%', paddingRight: '8%' }}
                   >
@@ -341,7 +342,7 @@ export default function MiniatureMap() {
                             style={{ cursor: 'pointer' }}
                             onClick={() => {
                               if (dragMoved.current) return;
-                              router.push(`/region/${selected}`);
+                              router.push(`/region/${selected}?suggestion=${suggestion.id}`);
                             }}
                           >
                             <div className="h-2 flex shrink-0">
@@ -381,15 +382,14 @@ export default function MiniatureMap() {
                     })}
                   </div>
 
-                  {/* 좌우 잘림 페이드 — 클릭하면 닫기 */}
-                  <div className="absolute top-0 left-0 bottom-0 w-[8%] bg-gradient-to-r from-black/60 to-transparent z-[1] cursor-pointer"
-                    onClick={() => setSelected(null)} />
-                  <div className="absolute top-0 right-0 bottom-0 w-[8%] bg-gradient-to-l from-black/60 to-transparent z-[1] cursor-pointer"
-                    onClick={() => setSelected(null)} />
+                  {/* 좌우 잘림 페이드 */}
+                  <div className="absolute top-0 left-0 bottom-0 w-[8%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none z-[1]" />
+                  <div className="absolute top-0 right-0 bottom-0 w-[8%] bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-[1]" />
                 </div>
 
                 {/* 좌우 버튼 */}
-                <div className="relative z-10 flex items-center justify-center gap-4 pb-3">
+                <div className="relative z-10 flex items-center justify-center gap-4 pb-3"
+                  onClick={(e) => e.stopPropagation()}>
                   <button onClick={() => scroll('left')}
                     className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 border border-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
