@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import CategoryTag from '@/components/shared/CategoryTag';
 import SuggestionLikeButton from './SuggestionLikeButton';
+import ReportButton from './ReportButton';
 import { REGIONS, type CategoryKey } from '@/data/categories';
 import type { Suggestion } from '@/types/suggestion';
 
@@ -85,7 +86,8 @@ export default function SuggestionCard({ suggestion, onClick }: SuggestionCardPr
             <span className="text-navy/15 text-[10px]">|</span>
             <span className="text-navy/25 text-[10px]">{suggestion.nickname}</span>
           </div>
-          <div onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <ReportButton suggestionId={suggestion.id} />
             <SuggestionLikeButton suggestionId={suggestion.id} initialLikes={suggestion.likes} size="sm" />
           </div>
         </div>

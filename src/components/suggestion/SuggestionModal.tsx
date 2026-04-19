@@ -4,6 +4,7 @@ import { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import CategoryTag from '@/components/shared/CategoryTag';
 import SuggestionLikeButton from './SuggestionLikeButton';
+import ReportButton from './ReportButton';
 import { REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
 import type { Suggestion } from '@/types/suggestion';
 
@@ -140,7 +141,8 @@ export default function SuggestionModal({ suggestion, onClose }: SuggestionModal
 
             <div className="h-px bg-navy-100/30 mb-6" />
 
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-between">
+              <ReportButton suggestionId={suggestion.id} />
               <SuggestionLikeButton suggestionId={suggestion.id} initialLikes={suggestion.likes} size="md" />
             </div>
           </div>

@@ -16,14 +16,16 @@ export async function submitSuggestion(
   const suggestion: Omit<Suggestion, 'id'> = {
     title: data.title,
     content: data.content,
-    reason: data.reason || undefined,
-    expectedEffect: data.expectedEffect || undefined,
+    reason: data.reason || '',
+    expectedEffect: data.expectedEffect || '',
     nickname: data.nickname,
     region: data.region,
     category: data.category,
+    password: data.password || '',
     status,
     createdAt: Date.now(),
     likes: 0,
+    reports: 0,
   };
 
   await set(newRef, suggestion);
@@ -184,6 +186,51 @@ export async function deleteSuggestion(suggestionId: string): Promise<void> {
 
   const suggestionRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}`);
   await set(suggestionRef, null);
+}
+
+// 신고 기능
+export async function reportSuggestion(suggestionId: string): Promise<number> {
+  // 중복 신고 방지 (localStorage)
+  const reportedKey = 'suggestion_reported';
+  const reportedIds: string[] = JSON.parse(localStorage.getItem(reportedKey) || '[]');
+  if (reportedIds.includes(suggestionId)) return -1; // 이미 신고함
+
+  if (isFirebaseConfigured && db) {
+    const reportsRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}/reports`);
+    const snapshot = await get(reportsRef);
+    const current = snapshot.val() || 0;
+    const newCount = current + 1;
+    await set(reportsRef, newCount);
+
+    // 신고 3회 이상 → 자동 pending 처리
+    if (newCount >= 3) {
+      const statusRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}/status`);
+      await set(statusRef, 'pending');
+    }
+
+    localStorage.setItem(reportedKey, JSON.stringify([...reportedIds, suggestionId]));
+    return newCount;
+  }
+
+  return 0;
+}
+
+export function isReported(suggestionId: string): boolean {
+  if (typeof window === 'undefined') return false;
+  const reportedIds: string[] = JSON.parse(localStorage.getItem('suggestion_reported') || '[]');
+  return reportedIds.includes(suggestionId);
+}
+
+// 비밀번호 검증 후 수정
+export async function verifySuggestionPassword(
+  suggestionId: string,
+  password: string
+): Promise<boolean> {
+  if (!isFirebaseConfigured || !db) return false;
+
+  const pwRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}/password`);
+  const snapshot = await get(pwRef);
+  return snapshot.val() === password;
 }
 
 // 관리자용: 제안 수정

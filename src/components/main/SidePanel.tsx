@@ -53,7 +53,7 @@ export default function SidePanel() {
         </div>
 
         <div className="relative py-3 px-4 rounded-xl bg-white/10 border border-white/15">
-          <p className="text-orange-light text-base font-bold text-center leading-relaxed">
+          <p className="text-orange-light text-sm font-bold text-center leading-relaxed whitespace-nowrap">
             &ldquo;시민과 함께 만드는 화성의 미래&rdquo;
           </p>
         </div>

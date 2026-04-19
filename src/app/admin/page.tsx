@@ -121,6 +121,7 @@ export default function AdminPage() {
         reason: uploadForm.reason,
         expectedEffect: uploadForm.expectedEffect,
         nickname: uploadForm.nickname || '관리자',
+        password: '',
         region: uploadForm.region as RegionKey,
         category: uploadForm.category as CategoryKey,
       },

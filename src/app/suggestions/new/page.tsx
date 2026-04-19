@@ -22,6 +22,7 @@ export default function NewSuggestionPage() {
   const [reason, setReason] = useState('');
   const [expectedEffect, setExpectedEffect] = useState('');
   const [nickname, setNickname] = useState('');
+  const [password, setPassword] = useState('');
   const [region, setRegion] = useState<RegionKey | ''>('');
   const [category, setCategory] = useState<CategoryKey | ''>('');
   const [submitting, setSubmitting] = useState(false);
@@ -43,6 +44,8 @@ export default function NewSuggestionPage() {
     if (!title.trim()) newErrors.title = '제목을 입력해주세요';
     if (!content.trim()) newErrors.content = '정책 내용을 입력해주세요';
     if (!nickname.trim()) newErrors.nickname = '닉네임을 입력해주세요';
+    if (!password.trim()) newErrors.password = '비밀번호를 입력해주세요';
+    if (password.trim().length < 4) newErrors.password = '비밀번호는 4자 이상 입력해주세요';
     if (!region) newErrors.region = '지역을 선택해주세요';
     if (!category) newErrors.category = '카테고리를 선택해주세요';
     setErrors(newErrors);
@@ -76,6 +79,7 @@ export default function NewSuggestionPage() {
           reason: reason.trim(),
           expectedEffect: expectedEffect.trim(),
           nickname: nickname.trim(),
+          password: password.trim(),
           region: region as RegionKey,
           category: category as CategoryKey,
         },
@@ -141,6 +145,7 @@ export default function NewSuggestionPage() {
                   setContent('');
                   setReason('');
                   setExpectedEffect('');
+                  setPassword('');
                 }}
                 className="px-6 py-3 rounded-xl border border-navy/10 text-navy font-bold hover:bg-navy-50 transition-colors"
               >
@@ -357,6 +362,25 @@ export default function NewSuggestionPage() {
                            placeholder:text-navy/25 transition-all"
               />
               {errors.nickname && <p className="text-red-500 text-xs mt-1">{errors.nickname}</p>}
+            </div>
+
+            {/* 비밀번호 */}
+            <div>
+              <label className="block text-navy font-bold text-sm mb-2">
+                수정 비밀번호 <span className="text-orange">*</span>
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="나중에 수정할 때 사용할 비밀번호 (4자 이상)"
+                maxLength={20}
+                className="w-full px-4 py-3 rounded-xl border border-navy/10 text-navy text-sm
+                           focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange
+                           placeholder:text-navy/25 transition-all"
+              />
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              <p className="text-navy/20 text-xs mt-1">본인 제안을 수정/삭제할 때 필요합니다</p>
             </div>
 
             {/* 선택 입력 영역 */}
