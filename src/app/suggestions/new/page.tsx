@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CATEGORIES, REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
 import { useGeoLocation } from '@/hooks/useGeoLocation';
+import { submitSuggestion } from '@/lib/suggestions';
+import { moderateContent } from '@/lib/moderation';
 import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
 
@@ -60,29 +62,39 @@ export default function NewSuggestionPage() {
     setResult(null);
 
     try {
-      const res = await fetch('/api/suggestions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const fullText = [title.trim(), content.trim(), reason.trim(), expectedEffect.trim()]
+        .filter(Boolean)
+        .join('\n');
+
+      const isApproved = moderateContent(fullText);
+      const status = isApproved ? 'approved' : 'pending';
+
+      const id = await submitSuggestion(
+        {
           title: title.trim(),
           content: content.trim(),
           reason: reason.trim(),
           expectedEffect: expectedEffect.trim(),
           nickname: nickname.trim(),
-          region,
-          category,
-        }),
-      });
+          region: region as RegionKey,
+          category: category as CategoryKey,
+        },
+        status
+      );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setResult({ status: data.status, message: data.message });
-      } else {
-        setResult({ status: 'error', message: data.error || '오류가 발생했습니다.' });
+      if (!id) {
+        setResult({ status: 'error', message: 'Firebase 연결에 실패했습니다.' });
+        return;
       }
+
+      setResult({
+        status,
+        message: isApproved
+          ? '정책 제안이 등록되었습니다!'
+          : '제안이 접수되었습니다. 검토 후 게시됩니다.',
+      });
     } catch {
-      setResult({ status: 'error', message: '네트워크 오류가 발생했습니다.' });
+      setResult({ status: 'error', message: '오류가 발생했습니다. 다시 시도해주세요.' });
     } finally {
       setSubmitting(false);
     }
