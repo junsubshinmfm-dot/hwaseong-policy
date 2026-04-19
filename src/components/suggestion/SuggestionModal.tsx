@@ -142,7 +142,7 @@ export default function SuggestionModal({ suggestion, onClose }: SuggestionModal
             <div className="h-px bg-navy-100/30 mb-6" />
 
             <div className="flex items-center justify-between">
-              <ReportButton suggestionId={suggestion.id} />
+              <ReportButton suggestionId={suggestion.id} size="md" />
               <SuggestionLikeButton suggestionId={suggestion.id} initialLikes={suggestion.likes} size="md" />
             </div>
           </div>

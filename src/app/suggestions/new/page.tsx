@@ -178,16 +178,16 @@ export default function NewSuggestionPage() {
         <div className="relative z-10 px-4 md:px-8 max-w-4xl mx-auto pt-10 pb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex items-start gap-5">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden shrink-0"
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden shrink-0"
                 style={{ background: 'linear-gradient(135deg, #F58220 0%, #F58220BB 100%)', boxShadow: '0 8px 32px #F5822040' }}>
                 <div className="absolute inset-0 bg-white/[0.08]" />
-                <svg className="w-8 h-8 relative z-[1]" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2}>
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 relative z-[1]" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-white text-3xl md:text-4xl font-black mb-1 drop-shadow-sm">정책 제안하기</h1>
-                <p className="text-white/60 text-sm">화성시에 필요한 정책을 직접 제안해주세요</p>
+                <h1 className="text-white text-2xl sm:text-3xl md:text-4xl font-black mb-1 drop-shadow-sm">정책 제안하기</h1>
+                <p className="text-white/60 text-xs sm:text-sm">화성시에 필요한 정책을 직접 제안해주세요</p>
               </div>
             </div>
           </motion.div>
@@ -203,7 +203,7 @@ export default function NewSuggestionPage() {
           className="bg-white rounded-2xl shadow-lg border border-navy/[0.06] overflow-hidden"
         >
           {/* GPS 위치 확인 */}
-          <div className="p-6 border-b border-navy/[0.06]">
+          <div className="p-4 sm:p-6 border-b border-navy/[0.06]">
             <h3 className="text-navy font-bold text-base mb-3 flex items-center gap-2">
               <svg className="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -254,7 +254,7 @@ export default function NewSuggestionPage() {
             {errors.geo && <p className="text-red-500 text-xs mt-2">{errors.geo}</p>}
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
             {/* 지역 선택 */}
             <div>
               <label className="block text-navy font-bold text-sm mb-2">

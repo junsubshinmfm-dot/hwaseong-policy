@@ -150,24 +150,24 @@ function RegionContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-            <h2 className="text-navy/40 text-sm font-bold uppercase tracking-wider ml-1 flex items-center gap-2">
-              <span className="w-4 h-0.5 rounded-full bg-orange" />
-              시민 정책제안
-            </h2>
-            <div className="flex items-center gap-3">
-              <FilterTabs activeFilter={activeFilter} onFilter={setActiveFilter} counts={categoryCounts} />
+          <div className="mb-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-navy/40 text-sm font-bold uppercase tracking-wider ml-1 flex items-center gap-2">
+                <span className="w-4 h-0.5 rounded-full bg-orange" />
+                시민 정책제안
+              </h2>
               <button
                 onClick={() => router.push('/suggestions/new')}
-                className="shrink-0 px-4 py-2 rounded-xl bg-orange text-white text-sm font-bold
-                           hover:bg-orange-dark hover:shadow-lg transition-all flex items-center gap-1.5"
+                className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-orange text-white text-xs sm:text-sm font-bold
+                           hover:bg-orange-dark hover:shadow-lg transition-all flex items-center gap-1"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
                 제안하기
               </button>
             </div>
+            <FilterTabs activeFilter={activeFilter} onFilter={setActiveFilter} counts={categoryCounts} />
           </div>
 
           {suggestionsLoading ? (
