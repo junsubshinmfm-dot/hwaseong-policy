@@ -185,3 +185,18 @@ export async function deleteSuggestion(suggestionId: string): Promise<void> {
   const suggestionRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}`);
   await set(suggestionRef, null);
 }
+
+// 관리자용: 제안 수정
+export async function updateSuggestion(
+  suggestionId: string,
+  data: Partial<Omit<Suggestion, 'id'>>
+): Promise<void> {
+  if (!isFirebaseConfigured || !db) return;
+
+  const suggestionRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}`);
+  const snapshot = await get(suggestionRef);
+  const current = snapshot.val();
+  if (!current) return;
+
+  await set(suggestionRef, { ...current, ...data });
+}

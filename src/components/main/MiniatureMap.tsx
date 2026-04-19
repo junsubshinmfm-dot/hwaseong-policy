@@ -224,7 +224,6 @@ export default function MiniatureMap() {
           {regionKeys.map((id) => {
             const poly = REGION_POLYGONS[id];
             const region = REGIONS[id];
-            const regionInfo = regionsData.find((r) => r.id === id);
             const isHovered = hovered === id;
             const isSelected = selected === id;
 
@@ -247,7 +246,7 @@ export default function MiniatureMap() {
                       color: time.period === 'night' ? 'rgba(255,255,255,0.7)' : 'rgba(26,59,143,0.7)',
                       textShadow: time.period === 'night' ? '0 1px 4px rgba(0,0,0,0.8)' : '0 1px 4px rgba(255,255,255,0.8)',
                     }}>
-                    {regionInfo?.policyCount || 0}개 제안
+                    제안 보기
                   </div>
                 </motion.div>
               </div>
@@ -405,7 +404,7 @@ export default function MiniatureMap() {
                     <span className="text-navy font-extrabold">{hoveredRegion.label}</span>
                     <span className="text-navy/40 text-sm">{hoveredInfo && `${(hoveredInfo.stats.population.total / 10000).toFixed(1)}만명`}</span>
                   </div>
-                  <span className="text-orange font-bold text-sm">{hoveredInfo?.policyCount || 0}개 공약</span>
+                  <span className="text-orange font-bold text-sm">클릭하여 보기</span>
                 </div>
               </motion.div>
             )}
