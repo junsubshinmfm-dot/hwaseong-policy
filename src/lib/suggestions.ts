@@ -139,3 +139,49 @@ export function isSuggestionLiked(suggestionId: string): boolean {
   const likedIds: string[] = JSON.parse(localStorage.getItem('suggestion_liked') || '[]');
   return likedIds.includes(suggestionId);
 }
+
+// 관리자용: pending 제안 포함 전체 구독
+export function subscribeAllSuggestions(
+  callback: (suggestions: Suggestion[]) => void
+): (() => void) | null {
+  if (!isFirebaseConfigured || !db) return null;
+
+  const suggestionsRef = ref(db, SUGGESTIONS_PATH);
+  const unsubscribe = onValue(suggestionsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data) {
+      callback([]);
+      return;
+    }
+
+    const suggestions: Suggestion[] = Object.entries(data)
+      .map(([id, value]) => ({
+        ...(value as Omit<Suggestion, 'id'>),
+        id,
+      }))
+      .sort((a, b) => b.createdAt - a.createdAt);
+
+    callback(suggestions);
+  });
+
+  return unsubscribe;
+}
+
+// 관리자용: 제안 상태 변경 (승인/거부)
+export async function updateSuggestionStatus(
+  suggestionId: string,
+  status: 'approved' | 'rejected'
+): Promise<void> {
+  if (!isFirebaseConfigured || !db) return;
+
+  const statusRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}/status`);
+  await set(statusRef, status);
+}
+
+// 관리자용: 제안 삭제
+export async function deleteSuggestion(suggestionId: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) return;
+
+  const suggestionRef = ref(db, `${SUGGESTIONS_PATH}/${suggestionId}`);
+  await set(suggestionRef, null);
+}
