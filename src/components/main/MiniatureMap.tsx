@@ -80,12 +80,6 @@ export default function MiniatureMap() {
   const hoveredRegion = hovered ? REGIONS[hovered] : null;
   const hoveredInfo = hovered ? regionsData.find((r) => r.id === hovered) : null;
 
-  // 스크롤 좌우 버튼
-  const scroll = useCallback((dir: 'left' | 'right') => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({ left: dir === 'left' ? -300 : 300, behavior: 'smooth' });
-  }, []);
-
   // 마우스 드래그 스크롤
   const isDragging = useRef(false);
   const dragStartX = useRef(0);
@@ -285,9 +279,9 @@ export default function MiniatureMap() {
                       자세히 보기
                     </button>
                     <button onClick={() => setSelected(null)}
-                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 hover:text-white transition-colors">
-                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors">
+                      <svg className="w-5 h-5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   </div>
@@ -298,7 +292,7 @@ export default function MiniatureMap() {
                   <div ref={scrollRef}
                     onClick={(e) => e.stopPropagation()}
                     className="flex gap-2 sm:gap-3 overflow-x-auto py-1 sm:py-2 scrollbar-hide items-center w-full cursor-grab select-none"
-                    style={{ height: 'clamp(200px, 55%, 600px)', paddingLeft: '8%', paddingRight: '8%' }}
+                    style={{ height: 'clamp(180px, 45%, 500px)', paddingLeft: '8%', paddingRight: '8%' }}
                   >
                     {/* 제안하기 카드 (항상 첫 번째) */}
                     <motion.div
@@ -387,21 +381,9 @@ export default function MiniatureMap() {
                   <div className="absolute top-0 right-0 bottom-0 w-[8%] bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-[1]" />
                 </div>
 
-                {/* 좌우 버튼 */}
-                <div className="relative z-10 flex items-center justify-center gap-4 pb-3"
-                  onClick={(e) => e.stopPropagation()}>
-                  <button onClick={() => scroll('left')}
-                    className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 border border-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button onClick={() => scroll('right')}
-                    className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 border border-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                {/* 하단 닫기 안내 */}
+                <div className="relative z-10 py-4 text-center">
+                  <p className="text-white/30 text-xs">빈 영역을 터치하면 닫힙니다</p>
                 </div>
               </motion.div>
             )}
