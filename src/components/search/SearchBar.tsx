@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import policiesData from '@/data/policies.json';
 
 interface SearchBarProps {
   value: string;
@@ -18,20 +17,14 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
 
   useEffect(() => { setLocalValue(value); }, [value]);
 
-  const computeSuggestions = useCallback((query: string) => {
-    if (!query.trim()) { setSuggestions([]); return; }
-    const q = query.toLowerCase();
-    const matches = policiesData
-      .filter((p) => p.title.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q))
-      .slice(0, 5)
-      .map((p) => p.title);
-    setSuggestions(matches);
+  const computeSuggestions = useCallback(() => {
+    setSuggestions([]);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setLocalValue(v);
-    computeSuggestions(v);
+    computeSuggestions();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => onChange(v), 300);
   };
@@ -63,9 +56,9 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
           type="text"
           value={localValue}
           onChange={handleChange}
-          onFocus={() => { setFocused(true); computeSuggestions(localValue); }}
+          onFocus={() => { setFocused(true); computeSuggestions(); }}
           onBlur={() => setTimeout(() => { setFocused(false); setSuggestions([]); }, 200)}
-          placeholder="공약 검색 (예: 교통, GTX, 청년)"
+          placeholder="시민제안 검색 (예: 교통, 복지, 교육)"
           className="flex-1 bg-transparent text-navy text-base font-medium placeholder:text-navy/30
                      outline-none"
         />

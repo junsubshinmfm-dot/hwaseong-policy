@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { REGIONS, CATEGORIES, type RegionKey, type CategoryKey } from '@/data/categories';
 import regionsData from '@/data/regions.json';
-import policiesData from '@/data/policies.json';
 import { useTimeOfDay, TIME_STYLES } from '@/hooks/useTimeOfDay';
+import { useSuggestionsByRegion } from '@/hooks/useSuggestions';
 import { useWeather } from '@/hooks/useWeather';
 import WeatherEffects from './WeatherEffects';
 import SkyBody from './SkyBody';
@@ -75,8 +75,8 @@ export default function MiniatureMap() {
     setSelected((prev) => (prev === id ? null : id));
   }, []);
 
+  const { suggestions: selectedSuggestions } = useSuggestionsByRegion(selected || 'dongtan');
   const selectedRegion = selected ? REGIONS[selected] : null;
-  const selectedPolicies = selected ? policiesData.filter((p) => p.region === selected) : [];
   const hoveredRegion = hovered ? REGIONS[hovered] : null;
   const hoveredInfo = hovered ? regionsData.find((r) => r.id === hovered) : null;
 
@@ -247,7 +247,7 @@ export default function MiniatureMap() {
                       color: time.period === 'night' ? 'rgba(255,255,255,0.7)' : 'rgba(26,59,143,0.7)',
                       textShadow: time.period === 'night' ? '0 1px 4px rgba(0,0,0,0.8)' : '0 1px 4px rgba(255,255,255,0.8)',
                     }}>
-                    {regionInfo?.policyCount || 0}개 공약
+                    {regionInfo?.policyCount || 0}개 제안
                   </div>
                 </motion.div>
               </div>
@@ -274,7 +274,7 @@ export default function MiniatureMap() {
                   <div className="flex items-center gap-1.5 sm:gap-2.5">
                     <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shadow-lg" style={{ backgroundColor: selectedRegion.color }} />
                     <span className="text-white font-extrabold text-sm sm:text-lg drop-shadow">{selectedRegion.label}</span>
-                    <span className="text-white/50 text-xs sm:text-sm font-bold">{selectedPolicies.length}개</span>
+                    <span className="text-white/50 text-xs sm:text-sm font-bold">{selectedSuggestions.length}개 제안</span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <button
@@ -299,12 +299,24 @@ export default function MiniatureMap() {
                     className="flex gap-2 sm:gap-3 overflow-x-auto py-1 sm:py-2 scrollbar-hide items-center w-full cursor-grab select-none"
                     style={{ height: 'clamp(200px, 55%, 600px)', paddingLeft: '8%', paddingRight: '8%' }}
                   >
-                    {selectedPolicies.map((policy, i) => {
-                      const catColor = CATEGORIES[policy.category as CategoryKey]?.color || '#1A3B8F';
+                    {selectedSuggestions.length === 0 ? (
+                      <div className="flex items-center justify-center w-full">
+                        <div className="text-center text-white/60">
+                          <p className="text-sm font-medium mb-2">아직 이 지역의 제안이 없습니다</p>
+                          <button
+                            onClick={() => router.push('/suggestions/new')}
+                            className="px-4 py-2 rounded-xl bg-orange text-white text-sm font-bold hover:bg-orange-dark transition-colors"
+                          >
+                            첫 번째 제안하기
+                          </button>
+                        </div>
+                      </div>
+                    ) : selectedSuggestions.map((suggestion, i) => {
+                      const catColor = CATEGORIES[suggestion.category as CategoryKey]?.color || '#1A3B8F';
 
                       return (
                         <motion.div
-                          key={policy.id}
+                          key={suggestion.id}
                           initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.35, delay: i * 0.03 }}
@@ -318,45 +330,38 @@ export default function MiniatureMap() {
                             style={{ cursor: 'pointer' }}
                             onClick={() => {
                               if (dragMoved.current) return;
-                              router.push(`/region/${selected}?policy=${policy.id}`);
+                              router.push(`/suggestions`);
                             }}
                           >
-                            {/* 컬러바 */}
                             <div className="h-2 flex shrink-0">
                               <div className="flex-1" style={{ backgroundColor: catColor }} />
-                              <div className="w-8" style={{ backgroundColor: selectedRegion.color }} />
+                              <div className="w-8 bg-orange" />
                             </div>
 
-                            {/* 비주얼 */}
                             <div className="relative shrink-0 h-16 sm:h-28 md:h-48">
                               <div className="absolute inset-0"
                                 style={{ background: `linear-gradient(135deg, ${catColor}08 0%, ${catColor}22 100%)` }} />
                               <div className="absolute -top-5 -right-5 w-20 h-20 rounded-full border-[3px] opacity-10"
                                 style={{ borderColor: catColor }} />
-                              <div className="absolute -bottom-3 -left-3 w-12 h-12 rounded-full opacity-[0.06]"
-                                style={{ backgroundColor: catColor }} />
                               <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-15">
-                                {categoryIcons[policy.category] || '\u{1F4CB}'}
+                                {categoryIcons[suggestion.category] || '\u{1F4CB}'}
                               </div>
-                              <div className="absolute top-3 left-3 w-8 h-8 rounded-xl text-white flex items-center justify-center text-sm font-black shadow-lg"
-                                style={{ backgroundColor: catColor }}>
-                                {policy.id}
+                              <div className="absolute top-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-bold text-white bg-orange shadow-lg">
+                                시민제안
                               </div>
                               <div className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-xs font-bold"
                                 style={{ backgroundColor: `${catColor}18`, color: catColor }}>
-                                {CATEGORIES[policy.category as CategoryKey]?.label}
+                                {CATEGORIES[suggestion.category as CategoryKey]?.label}
                               </div>
-                              {/* 하단 페이드 */}
                               <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent" />
                             </div>
 
-                            {/* 텍스트 */}
                             <div className="px-3.5 pb-3 pt-1 flex-1 flex flex-col">
                               <h4 className="text-navy font-extrabold text-[11px] sm:text-sm mb-1 sm:mb-1.5 line-clamp-1 sm:line-clamp-2 leading-snug">
-                                {policy.title}
+                                {suggestion.title}
                               </h4>
                               <p className="text-navy/35 text-[10px] sm:text-xs line-clamp-1 sm:line-clamp-3 leading-relaxed flex-1">
-                                {policy.summary}
+                                {suggestion.content}
                               </p>
                             </div>
                           </div>

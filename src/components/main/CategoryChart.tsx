@@ -2,13 +2,15 @@
 
 import { useMemo } from 'react';
 import { CATEGORIES, type CategoryKey } from '@/data/categories';
-import policiesData from '@/data/policies.json';
+import { useSuggestions } from '@/hooks/useSuggestions';
 
 export default function CategoryChart() {
+  const { suggestions } = useSuggestions();
+
   const categoryStats = useMemo(() => {
     const counts: Record<string, number> = {};
-    policiesData.forEach((p) => {
-      counts[p.category] = (counts[p.category] || 0) + 1;
+    suggestions.forEach((s) => {
+      counts[s.category] = (counts[s.category] || 0) + 1;
     });
 
     return Object.entries(CATEGORIES)
@@ -20,7 +22,7 @@ export default function CategoryChart() {
         count: counts[key] || 0,
       }))
       .sort((a, b) => b.count - a.count);
-  }, []);
+  }, [suggestions]);
 
   const maxCount = Math.max(...categoryStats.map((c) => c.count), 1);
 
@@ -28,7 +30,7 @@ export default function CategoryChart() {
     <div className="brand-card p-4">
       <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
         <span className="w-3 h-3 rounded-sm bg-orange" />
-        분야별 공약
+        분야별 시민제안
       </h3>
 
       <div className="space-y-2.5">
