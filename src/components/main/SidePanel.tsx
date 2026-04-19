@@ -1,16 +1,20 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { CATEGORIES, type CategoryKey } from '@/data/categories';
-import policiesData from '@/data/policies.json';
+import { useSuggestions } from '@/hooks/useSuggestions';
 import PolicyRanking from './PolicyRanking';
 import MyAreaPolicies from './MyAreaPolicies';
 
 export default function SidePanel() {
+  const router = useRouter();
+  const { suggestions } = useSuggestions();
+
   const categoryStats = useMemo(() => {
     const counts: Record<string, number> = {};
-    policiesData.forEach((p) => {
-      counts[p.category] = (counts[p.category] || 0) + 1;
+    suggestions.forEach((s) => {
+      counts[s.category] = (counts[s.category] || 0) + 1;
     });
 
     return Object.entries(CATEGORIES)
@@ -22,15 +26,14 @@ export default function SidePanel() {
         count: counts[key] || 0,
       }))
       .sort((a, b) => b.count - a.count);
-  }, []);
+  }, [suggestions]);
 
   const maxCount = Math.max(...categoryStats.map((c) => c.count), 1);
 
   return (
     <div className="h-full flex flex-col gap-4">
-      {/* ── 프로필 카드: 네이비 배경 ── */}
+      {/* 프로필 카드 */}
       <div className="brand-card-navy p-6 relative overflow-hidden">
-        {/* 장식 원호 (흰색 계열) */}
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full border-[4px] border-white/10 pointer-events-none" />
         <div className="absolute -bottom-8 -left-8 w-20 h-20 rounded-full border-[4px] border-orange/20 pointer-events-none" />
         <div className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-orange/20" />
@@ -49,25 +52,32 @@ export default function SidePanel() {
           </div>
         </div>
 
-        {/* 슬로건 */}
         <div className="relative py-3 px-4 rounded-xl bg-white/10 border border-white/15">
           <p className="text-orange-light text-base font-bold text-center leading-relaxed">
-            &ldquo;100가지 약속, 화성의 미래&rdquo;
+            &ldquo;시민과 함께 만드는 화성의 미래&rdquo;
           </p>
         </div>
 
-        {/* 총 공약 수 */}
+        {/* 시민 제안 수 + 제안하기 버튼 */}
         <div className="mt-5 flex items-baseline gap-2 justify-center">
-          <span className="text-5xl font-black text-orange">{policiesData.length}</span>
-          <span className="text-white/60 text-base font-medium">개 공약</span>
+          <span className="text-5xl font-black text-orange">{suggestions.length}</span>
+          <span className="text-white/60 text-base font-medium">개 시민제안</span>
         </div>
+
+        <button
+          onClick={() => router.push('/suggestions/new')}
+          className="w-full mt-4 py-2.5 rounded-xl text-sm font-bold text-navy bg-white/90
+                     hover:bg-white hover:shadow-lg transition-all"
+        >
+          정책 제안하기
+        </button>
       </div>
 
-      {/* ── 분야별 공약 바차트 ── */}
+      {/* 분야별 제안 바차트 */}
       <div className="brand-card p-5 flex-1">
         <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
           <span className="w-3 h-3 rounded-sm bg-orange" />
-          분야별 공약
+          분야별 시민제안
         </h3>
 
         <div className="space-y-3">
@@ -96,10 +106,10 @@ export default function SidePanel() {
         </div>
       </div>
 
-      {/* 인기 공약 랭킹 */}
+      {/* 인기 정책제안 랭킹 */}
       <PolicyRanking />
 
-      {/* 우리동네 공약 */}
+      {/* 우리동네 정책제안 */}
       <MyAreaPolicies />
     </div>
   );

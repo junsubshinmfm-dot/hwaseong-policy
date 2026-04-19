@@ -1,28 +1,18 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { REGIONS, type RegionKey, type CategoryKey } from '@/data/categories';
 import { useRegionData } from '@/hooks/useRegionData';
+import { useSuggestionsByRegion } from '@/hooks/useSuggestions';
 import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
 import Dashboard from '@/components/region/Dashboard';
-import PolicyGrid from '@/components/region/PolicyGrid';
 import FilterTabs from '@/components/region/FilterTabs';
-import PolicyModal from '@/components/modal/PolicyModal';
-
-interface Policy {
-  id: number;
-  title: string;
-  summary: string;
-  detail: string;
-  region: string;
-  category: string;
-  videoUrl: string;
-  thumbnail: string;
-  priority: number;
-}
+import SuggestionGrid from '@/components/suggestion/SuggestionGrid';
+import SuggestionModal from '@/components/suggestion/SuggestionModal';
+import type { Suggestion } from '@/types/suggestion';
 
 export default function RegionPage() {
   return (
@@ -38,50 +28,26 @@ export default function RegionPage() {
 
 function RegionContent() {
   const params = useParams();
-  const searchParams = useSearchParams();
+  const router = useRouter();
   const regionId = params.id as RegionKey;
   const regionMeta = REGIONS[regionId];
 
-  const { region, policies } = useRegionData(regionId);
+  const { region } = useRegionData(regionId);
+  const { suggestions, loading: suggestionsLoading } = useSuggestionsByRegion(regionId);
   const [activeFilter, setActiveFilter] = useState<CategoryKey | null>(null);
-  const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null);
+  const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null);
 
   const categoryCounts = useMemo(() => {
     const counts: Partial<Record<CategoryKey, number>> = {};
-    policies.forEach((p) => {
-      const cat = p.category as CategoryKey;
+    suggestions.forEach((s) => {
+      const cat = s.category as CategoryKey;
       counts[cat] = (counts[cat] || 0) + 1;
     });
     return counts;
-  }, [policies]);
-
-  const openModal = useCallback(
-    (policy: Policy) => {
-      setSelectedPolicy(policy);
-      const url = new URL(window.location.href);
-      url.searchParams.set('policy', String(policy.id));
-      window.history.replaceState(null, '', url.toString());
-    },
-    [],
-  );
-
-  const closeModal = useCallback(() => {
-    setSelectedPolicy(null);
-    const url = new URL(window.location.href);
-    url.searchParams.delete('policy');
-    window.history.replaceState(null, '', url.toString());
-  }, []);
+  }, [suggestions]);
 
   useEffect(() => {
-    const policyId = searchParams.get('policy');
-    if (policyId && policies.length > 0) {
-      const found = policies.find((p) => p.id === Number(policyId));
-      if (found) setSelectedPolicy(found as Policy);
-    }
-  }, [searchParams, policies]);
-
-  useEffect(() => {
-    const handlePopState = () => setSelectedPolicy(null);
+    const handlePopState = () => setSelectedSuggestion(null);
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
@@ -108,7 +74,6 @@ function RegionContent() {
               background: `linear-gradient(160deg, #0D1F4D 0%, ${regionMeta.color}30 40%, #F4F5F9 100%)`,
             }}
           />
-          {/* 장식 원호 — 큰 것 */}
           <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full border-[4px] border-white/[0.06]" />
           <div className="absolute top-10 -left-10 w-40 h-40 rounded-full border-[3px] border-white/[0.04]" />
           <div className="absolute bottom-0 right-1/4 w-24 h-24 rounded-full bg-orange/[0.04]" />
@@ -128,7 +93,6 @@ function RegionContent() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-start gap-5">
-              {/* 권역 아이콘 — 글래시 */}
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden shrink-0"
                 style={{
@@ -149,7 +113,7 @@ function RegionContent() {
                 <h1 className="text-white text-3xl md:text-4xl font-black mb-1 drop-shadow-sm">{regionMeta.label}</h1>
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 backdrop-blur-sm text-white/80 text-sm font-semibold">
-                    {policies.length}개 공약
+                    {suggestions.length}개 시민제안
                   </span>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 backdrop-blur-sm text-white/80 text-sm font-semibold">
                     인구 {(region.stats.population.total / 10000).toFixed(1)}만명
@@ -180,7 +144,7 @@ function RegionContent() {
           <Dashboard stats={region.stats} regionColor={regionMeta.color} />
         </motion.section>
 
-        {/* 공약 캐러셀 */}
+        {/* 시민 정책제안 */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -188,30 +152,61 @@ function RegionContent() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
             <h2 className="text-navy/40 text-sm font-bold uppercase tracking-wider ml-1 flex items-center gap-2">
-              <span className="w-4 h-0.5 rounded-full bg-navy" />
-              공약 목록
+              <span className="w-4 h-0.5 rounded-full bg-orange" />
+              시민 정책제안
             </h2>
-            <FilterTabs activeFilter={activeFilter} onFilter={setActiveFilter} counts={categoryCounts} />
+            <div className="flex items-center gap-3">
+              <FilterTabs activeFilter={activeFilter} onFilter={setActiveFilter} counts={categoryCounts} />
+              <button
+                onClick={() => router.push('/suggestions/new')}
+                className="shrink-0 px-4 py-2 rounded-xl bg-orange text-white text-sm font-bold
+                           hover:bg-orange-dark hover:shadow-lg transition-all flex items-center gap-1.5"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                제안하기
+              </button>
+            </div>
           </div>
 
-          <PolicyGrid
-            policies={policies as Policy[]}
-            activeFilter={activeFilter}
-            onCardClick={(p) => openModal(p as Policy)}
-          />
+          {suggestionsLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-2 border-navy-100 border-t-navy rounded-full animate-spin" />
+            </div>
+          ) : (
+            <SuggestionGrid
+              suggestions={suggestions}
+              activeFilter={activeFilter}
+              onCardClick={setSelectedSuggestion}
+            />
+          )}
         </motion.section>
       </div>
 
-      {/* 하단 브랜드 스트립 */}
-      <GeoPattern variant="strip" className="w-full h-12" />
+      {/* 플로팅 제안 버튼 (모바일) */}
+      <button
+        onClick={() => router.push('/suggestions/new')}
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-orange text-white shadow-xl
+                   hover:bg-orange-dark hover:scale-105 transition-all z-40
+                   flex items-center justify-center sm:hidden"
+      >
+        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
 
-      {/* 코너 장식 */}
+      <GeoPattern variant="strip" className="w-full h-12" />
       <GeoPattern variant="corner-br" className="w-[250px] h-[250px] z-0 opacity-60" />
 
       {/* 모달 */}
       <AnimatePresence>
-        {selectedPolicy && (
-          <PolicyModal key={selectedPolicy.id} policy={selectedPolicy} onClose={closeModal} />
+        {selectedSuggestion && (
+          <SuggestionModal
+            key={selectedSuggestion.id}
+            suggestion={selectedSuggestion}
+            onClose={() => setSelectedSuggestion(null)}
+          />
         )}
       </AnimatePresence>
     </main>

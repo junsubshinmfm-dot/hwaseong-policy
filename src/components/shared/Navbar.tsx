@@ -172,6 +172,21 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
+            {/* 정책제안 */}
+            <Link
+              href="/suggestions"
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                isActive('/suggestions')
+                  ? 'bg-orange text-white shadow-sm'
+                  : 'text-gray-500 hover:text-navy hover:bg-navy-50'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+              정책제안
+            </Link>
+
             {/* 검색 */}
             <Link
               href="/search"
@@ -243,6 +258,11 @@ export default function Navbar() {
                   {cat.label}
                 </button>
               ))}
+
+              <Link href="/suggestions" onClick={() => setMobileOpen(false)}
+                className={`block px-4 py-3 rounded-xl text-base font-semibold ${isActive('/suggestions') ? 'bg-orange text-white' : 'text-gray-600'}`}>
+                정책제안
+              </Link>
 
               <Link href="/search" onClick={() => setMobileOpen(false)}
                 className={`block px-4 py-3 rounded-xl text-base font-semibold ${isActive('/search') ? 'bg-navy text-white' : 'text-gray-600'}`}>
