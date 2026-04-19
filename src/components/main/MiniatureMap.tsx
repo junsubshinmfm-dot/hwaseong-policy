@@ -298,19 +298,30 @@ export default function MiniatureMap() {
                     className="flex gap-2 sm:gap-3 overflow-x-auto py-1 sm:py-2 scrollbar-hide items-center w-full cursor-grab select-none"
                     style={{ height: 'clamp(200px, 55%, 600px)', paddingLeft: '8%', paddingRight: '8%' }}
                   >
-                    {selectedSuggestions.length === 0 ? (
-                      <div className="flex items-center justify-center w-full">
-                        <div className="text-center text-white/60">
-                          <p className="text-sm font-medium mb-2">아직 이 지역의 제안이 없습니다</p>
-                          <button
-                            onClick={() => router.push('/suggestions/new')}
-                            className="px-4 py-2 rounded-xl bg-orange text-white text-sm font-bold hover:bg-orange-dark transition-colors"
-                          >
-                            첫 번째 제안하기
-                          </button>
+                    {/* 제안하기 카드 (항상 첫 번째) */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35 }}
+                      className="shrink-0"
+                      style={{ width: 'calc(24% - 10px)', minWidth: '140px' }}
+                    >
+                      <div
+                        className="h-full bg-gradient-to-br from-orange to-orange-dark rounded-2xl overflow-hidden shadow-2xl
+                                   hover:scale-[1.03] hover:-translate-y-2 transition-all duration-300
+                                   border border-white/30 flex flex-col items-center justify-center cursor-pointer p-4"
+                        onClick={() => router.push('/suggestions/new')}
+                      >
+                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-3">
+                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                          </svg>
                         </div>
+                        <p className="text-white font-bold text-sm text-center">정책 제안하기</p>
+                        <p className="text-white/60 text-[10px] text-center mt-1">이 지역에 필요한 정책을 제안해주세요</p>
                       </div>
-                    ) : selectedSuggestions.map((suggestion, i) => {
+                    </motion.div>
+                    {selectedSuggestions.map((suggestion, i) => {
                       const catColor = CATEGORIES[suggestion.category as CategoryKey]?.color || '#1A3B8F';
 
                       return (

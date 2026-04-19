@@ -52,9 +52,9 @@ export default function NewSuggestionPage() {
   const handleSubmit = async () => {
     if (!validate()) return;
 
-    // GPS 검증
-    if (geoStatus !== 'in_hwaseong') {
-      setErrors({ geo: '화성시 위치에서만 정책을 제안할 수 있습니다. 위치 확인 버튼을 눌러주세요.' });
+    // GPS: 화성시 여부만 확인 (확인 안 했으면 안내)
+    if (geoStatus === 'idle' || geoStatus === 'loading') {
+      setErrors({ geo: '위치 확인 버튼을 눌러주세요.' });
       return;
     }
 
@@ -83,7 +83,7 @@ export default function NewSuggestionPage() {
       );
 
       if (!id) {
-        setResult({ status: 'error', message: 'Firebase 연결에 실패했습니다.' });
+        setResult({ status: 'error', message: 'Firebase 연결에 실패했습니다. 잠시 후 다시 시도해주세요.' });
         return;
       }
 
@@ -93,8 +93,10 @@ export default function NewSuggestionPage() {
           ? '정책 제안이 등록되었습니다!'
           : '제안이 접수되었습니다. 검토 후 게시됩니다.',
       });
-    } catch {
-      setResult({ status: 'error', message: '오류가 발생했습니다. 다시 시도해주세요.' });
+    } catch (err) {
+      console.error('제안 제출 오류:', err);
+      const message = err instanceof Error ? err.message : '알 수 없는 오류';
+      setResult({ status: 'error', message: `오류가 발생했습니다: ${message}` });
     } finally {
       setSubmitting(false);
     }
@@ -226,22 +228,20 @@ export default function NewSuggestionPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span className="text-sm font-bold">화성시 위치 확인 완료</span>
-                {closestRegion && (
-                  <span className="text-xs text-green-600 ml-1">
-                    (가장 가까운 권역: {REGIONS[closestRegion].label})
-                  </span>
-                )}
               </div>
             )}
             {geoStatus === 'outside' && (
-              <div className="py-2 px-4 rounded-xl bg-red-50 text-red-600 text-sm font-medium">
-                현재 화성시 범위 밖에 계십니다. 화성시 내에서만 제안이 가능합니다.
+              <div className="flex items-center gap-2 py-2 px-4 rounded-xl bg-orange/10 text-orange">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-bold">화성시 외 지역입니다</span>
               </div>
             )}
             {(geoStatus === 'denied' || geoStatus === 'error') && (
               <div className="space-y-2">
                 <div className="py-2 px-4 rounded-xl bg-orange/10 text-orange text-sm font-medium">
-                  {geoStatus === 'denied' ? '위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요.' : '위치를 확인할 수 없습니다.'}
+                  {geoStatus === 'denied' ? '위치 권한이 거부되었습니다.' : '위치를 확인할 수 없습니다.'}
                 </div>
                 <button onClick={handleGeoClick} className="text-sm text-navy font-bold underline">다시 시도</button>
               </div>
@@ -406,9 +406,9 @@ export default function NewSuggestionPage() {
             {/* 제출 버튼 */}
             <button
               onClick={handleSubmit}
-              disabled={submitting || geoStatus !== 'in_hwaseong'}
+              disabled={submitting}
               className={`w-full py-4 rounded-xl text-base font-bold transition-all ${
-                submitting || geoStatus !== 'in_hwaseong'
+                submitting
                   ? 'bg-navy/20 text-navy/40 cursor-not-allowed'
                   : 'bg-gradient-to-r from-orange to-orange-dark text-white hover:shadow-lg hover:scale-[1.01]'
               }`}
@@ -418,8 +418,6 @@ export default function NewSuggestionPage() {
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   제출 중...
                 </span>
-              ) : geoStatus !== 'in_hwaseong' ? (
-                '위치 확인 후 제안 가능합니다'
               ) : (
                 '정책 제안하기'
               )}
