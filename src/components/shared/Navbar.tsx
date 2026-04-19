@@ -174,7 +174,7 @@ export default function Navbar() {
 
             {/* 정책제안 */}
             <Link
-              href="/suggestions"
+              href="/suggestions/new"
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
                 isActive('/suggestions')
                   ? 'bg-orange text-white shadow-sm'
@@ -259,7 +259,7 @@ export default function Navbar() {
                 </button>
               ))}
 
-              <Link href="/suggestions" onClick={() => setMobileOpen(false)}
+              <Link href="/suggestions/new" onClick={() => setMobileOpen(false)}
                 className={`block px-4 py-3 rounded-xl text-base font-semibold ${isActive('/suggestions') ? 'bg-orange text-white' : 'text-gray-600'}`}>
                 정책제안
               </Link>
