@@ -371,14 +371,36 @@ export default function NewSuggestionPage() {
 
                 {/* 개인정보 수집 동의 */}
                 <div className="p-4 rounded-xl bg-navy-50/50 border border-navy/[0.06]">
-                  <div className="text-navy/60 text-xs leading-relaxed mb-3 space-y-1">
-                    <p className="font-bold text-navy">[개인정보 수집 및 이용 동의]</p>
-                    <p>• <b className="text-navy/70">수집 항목:</b> 이름, 전화번호</p>
-                    <p>• <b className="text-navy/70">수집 목적:</b> 제안 정책 반영 시 연락 및 공약 반영 안내</p>
-                    <p>• <b className="text-navy/70">보유 기간:</b> 선거 종료 후 6개월까지</p>
-                    <p>• <b className="text-navy/70">동의 거부 권리:</b> 동의를 거부할 권리가 있으나, 거부 시 제안 등록이 제한됩니다.</p>
-                    <p className="text-navy/40 mt-2">수집된 정보는 운영자만 열람하며 외부에 공개되지 않습니다.</p>
+                  <p className="font-bold text-navy text-sm mb-3">[개인정보 수집 및 이용 동의]</p>
+
+                  <div className="text-navy/60 text-xs leading-relaxed space-y-2 mb-3">
+                    <div className="flex gap-2">
+                      <span className="shrink-0 w-16 font-bold text-navy/70">① 수집 항목</span>
+                      <span>이름, 전화번호</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="shrink-0 w-16 font-bold text-navy/70">② 수집 목적</span>
+                      <span>제안하신 정책에 대한 피드백 안내 및 공약 반영 시 연락</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="shrink-0 w-16 font-bold text-navy/70">③ 보유 기간</span>
+                      <span>제8회 전국동시지방선거 종료 후 6개월 이내 즉시 파기</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="shrink-0 w-16 font-bold text-navy/70">④ 거부 권리</span>
+                      <span className="leading-relaxed">
+                        정보 주체는 동의를 거부할 권리가 있습니다. 다만 거부 시 제안하신 공약이 선정되어도
+                        <b className="text-orange"> 연락드리기 어려울 수 있습니다.</b> 아무쪼록 동의를 부탁드립니다.
+                      </span>
+                    </div>
                   </div>
+
+                  <div className="p-2.5 rounded-lg bg-white/60 border border-navy/[0.04] mb-3">
+                    <p className="text-navy/50 text-[11px] leading-relaxed">
+                      🔒 수집된 정보는 <b>운영자만 열람</b>하며, 제3자에게 제공·공개하지 않습니다. 정보주체는 언제든지 연락하여 열람·정정·삭제를 요청할 수 있습니다.
+                    </p>
+                  </div>
+
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -386,7 +408,7 @@ export default function NewSuggestionPage() {
                       onChange={(e) => setConsent(e.target.checked)}
                       className="w-4 h-4 rounded border-navy/30 text-orange focus:ring-orange/30"
                     />
-                    <span className="text-navy font-bold text-sm">개인정보 수집 및 이용에 동의합니다</span>
+                    <span className="text-navy font-bold text-sm">위 개인정보 수집 및 이용에 동의합니다</span>
                   </label>
                   {errors.consent && <p className="text-red-500 text-xs mt-2">{errors.consent}</p>}
                 </div>
