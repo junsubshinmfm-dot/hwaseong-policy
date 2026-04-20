@@ -32,15 +32,22 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
   const [showSpeech, setShowSpeech] = useState(false);
   const [quote, setQuote] = useState('');
   const moveCountRef = useRef(0);
+  const disabledRef = useRef(disabled);
+
+  // disabled는 ref에 동기화 — effect 재실행 방지
+  useEffect(() => {
+    disabledRef.current = disabled;
+  }, [disabled]);
 
   const triggerSpeech = useCallback(() => {
+    if (disabledRef.current) return;
     const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     setQuote(randomQuote);
     setShowSpeech(true);
     setTimeout(() => setShowSpeech(false), 3500);
   }, []);
 
-  // 랜덤 위치로 이동
+  // 랜덤 위치로 이동 — 한 번만 실행되는 안정적 interval
   useEffect(() => {
     const move = () => {
       const newX = 10 + Math.random() * 80;
@@ -54,19 +61,23 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
       setIsWalking(true);
       setTimeout(() => setIsWalking(false), 6000);
 
-      // 2번 이동할 때마다 1초 후 말풍선 (자동)
+      // 2번 이동할 때마다 1초 후 말풍선
       moveCountRef.current += 1;
       if (moveCountRef.current >= 2) {
         moveCountRef.current = 0;
-        setTimeout(() => {
-          if (!disabled) triggerSpeech();
-        }, 1000);
+        setTimeout(() => triggerSpeech(), 1000);
       }
     };
 
-    const interval = setInterval(move, 8000 + Math.random() * 4000);
-    return () => clearInterval(interval);
-  }, [disabled, triggerSpeech]);
+    // 시작 시 랜덤 딜레이 후 첫 이동 (페이지 로드 후 너무 늦지 않게)
+    const firstMoveTimer = setTimeout(move, 3000);
+    const interval = setInterval(move, 10000);
+
+    return () => {
+      clearTimeout(firstMoveTimer);
+      clearInterval(interval);
+    };
+  }, [triggerSpeech]);
 
   const handleClick = () => {
     if (disabled) return;
