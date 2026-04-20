@@ -64,8 +64,7 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
       className="absolute inset-0 pointer-events-none z-[5]"
     >
       <motion.div
-        className={`absolute ${disabled ? 'pointer-events-none' : 'pointer-events-auto'} cursor-pointer`}
-        style={{ width: 48, height: 64 }}
+        className={`absolute w-7 h-10 sm:w-9 sm:h-12 lg:w-10 lg:h-14 ${disabled ? 'pointer-events-none' : 'pointer-events-auto'} cursor-pointer`}
         animate={{
           left: `${position.x}%`,
           top: `${position.y}%`,
@@ -130,7 +129,7 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
  */
 function CharacterSVG() {
   return (
-    <svg viewBox="0 0 32 42" width="48" height="64" shapeRendering="crispEdges">
+    <svg viewBox="0 0 32 42" width="100%" height="100%" shapeRendering="crispEdges">
       {/* 머리카락 (검은색) */}
       <rect x="8" y="2" width="16" height="2" fill="#1a1a1a" />
       <rect x="6" y="4" width="20" height="2" fill="#1a1a1a" />
