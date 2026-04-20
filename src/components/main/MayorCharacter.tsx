@@ -77,21 +77,37 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
         }}
         onClick={handleClick}
       >
-        {/* 말풍선 */}
+        {/* 말풍선 — 캐릭터 머리 바로 위 중앙 */}
         <AnimatePresence>
           {showSpeech && !disabled && (
-            <motion.div
-              initial={{ opacity: 0, y: 5, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -5, scale: 0.8 }}
-              className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap"
-              style={{ bottom: 'calc(100% + 4px)' }}
+            <div
+              className="absolute left-1/2 pointer-events-none"
+              style={{
+                bottom: 'calc(100% + 4px)',
+                transform: 'translateX(-50%)',
+              }}
             >
-              <div className="relative px-3 py-1.5 rounded-xl bg-white shadow-xl border border-navy/20">
-                <p className="text-navy text-[11px] font-bold">{quote}</p>
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-white border-r border-b border-navy/20 rotate-45" />
-              </div>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.2 }}
+                className="whitespace-nowrap"
+                style={{ transformOrigin: 'bottom center' }}
+              >
+                <div className="relative px-3 py-1.5 rounded-xl bg-white shadow-xl border border-navy/20">
+                  <p className="text-navy text-[11px] font-bold">{quote}</p>
+                  <div
+                    className="absolute w-3 h-3 bg-white border-r border-b border-navy/20 rotate-45"
+                    style={{
+                      left: '50%',
+                      bottom: '-6px',
+                      transform: 'translateX(-50%) rotate(45deg)',
+                    }}
+                  />
+                </div>
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
 
