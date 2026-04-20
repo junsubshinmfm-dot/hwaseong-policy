@@ -85,7 +85,7 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -5, scale: 0.8 }}
               className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap"
-              style={{ top: -44 }}
+              style={{ bottom: 'calc(100% + 4px)' }}
             >
               <div className="relative px-3 py-1.5 rounded-xl bg-white shadow-xl border border-navy/20">
                 <p className="text-navy text-[11px] font-bold">{quote}</p>
