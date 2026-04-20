@@ -83,7 +83,7 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
             <div
               className="absolute left-1/2 pointer-events-none"
               style={{
-                bottom: 'calc(100% + 4px)',
+                bottom: 'calc(100% + 12px)',
                 transform: 'translateX(-50%)',
               }}
             >
