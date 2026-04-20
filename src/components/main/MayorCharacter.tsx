@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
@@ -31,6 +31,14 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
   const [isWalking, setIsWalking] = useState(false);
   const [showSpeech, setShowSpeech] = useState(false);
   const [quote, setQuote] = useState('');
+  const moveCountRef = useRef(0);
+
+  const triggerSpeech = useCallback(() => {
+    const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    setQuote(randomQuote);
+    setShowSpeech(true);
+    setTimeout(() => setShowSpeech(false), 3500);
+  }, []);
 
   // 랜덤 위치로 이동
   useEffect(() => {
@@ -38,24 +46,31 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
       const newX = 10 + Math.random() * 80;
       const newY = 20 + Math.random() * 60;
 
-      setDirection(newX > position.x ? 'right' : 'left');
-      setIsWalking(true);
-      setPosition({ x: newX, y: newY });
+      setPosition((currentPos) => {
+        setDirection(newX > currentPos.x ? 'right' : 'left');
+        return { x: newX, y: newY };
+      });
 
-      // 이동 시간 6초 이후 멈춤
+      setIsWalking(true);
       setTimeout(() => setIsWalking(false), 6000);
+
+      // 2번 이동할 때마다 1초 후 말풍선 (자동)
+      moveCountRef.current += 1;
+      if (moveCountRef.current >= 2) {
+        moveCountRef.current = 0;
+        setTimeout(() => {
+          if (!disabled) triggerSpeech();
+        }, 1000);
+      }
     };
 
     const interval = setInterval(move, 8000 + Math.random() * 4000);
     return () => clearInterval(interval);
-  }, [position.x]);
+  }, [disabled, triggerSpeech]);
 
   const handleClick = () => {
     if (disabled) return;
-    const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-    setQuote(randomQuote);
-    setShowSpeech(true);
-    setTimeout(() => setShowSpeech(false), 3500);
+    triggerSpeech();
   };
 
   return (
