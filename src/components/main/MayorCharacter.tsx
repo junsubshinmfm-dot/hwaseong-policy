@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * 정명근 도트 캐릭터 — 지도 위를 자유롭게 뛰어다님
- * - 5~8초마다 랜덤 위치로 이동
+ * - 8~12초마다 랜덤 위치로 이동 (느리게)
  * - 방향에 따라 좌우 반전
  * - 걷기 애니메이션 (위아래 살짝 튐)
- * - 클릭 시 말풍선
+ * - 클릭 시 말풍선 (선택 오버레이 열리면 비활성)
  */
 
 const QUOTES = [
@@ -20,9 +20,13 @@ const QUOTES = [
   '모든 제안을 소중히 검토하겠습니다',
 ];
 
-export default function MayorCharacter() {
+interface MayorCharacterProps {
+  disabled?: boolean;
+}
+
+export default function MayorCharacter({ disabled = false }: MayorCharacterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 50, y: 50 }); // % 기준
+  const [position, setPosition] = useState({ x: 50, y: 50 });
   const [direction, setDirection] = useState<'left' | 'right'>('right');
   const [isWalking, setIsWalking] = useState(false);
   const [showSpeech, setShowSpeech] = useState(false);
@@ -31,22 +35,23 @@ export default function MayorCharacter() {
   // 랜덤 위치로 이동
   useEffect(() => {
     const move = () => {
-      const newX = 10 + Math.random() * 80; // 10% ~ 90%
-      const newY = 20 + Math.random() * 60; // 20% ~ 80%
+      const newX = 10 + Math.random() * 80;
+      const newY = 20 + Math.random() * 60;
 
       setDirection(newX > position.x ? 'right' : 'left');
       setIsWalking(true);
       setPosition({ x: newX, y: newY });
 
-      // 이동 완료 후 걷기 종료
-      setTimeout(() => setIsWalking(false), 3000);
+      // 이동 시간 6초 이후 멈춤
+      setTimeout(() => setIsWalking(false), 6000);
     };
 
-    const interval = setInterval(move, 4000 + Math.random() * 3000);
+    const interval = setInterval(move, 8000 + Math.random() * 4000);
     return () => clearInterval(interval);
   }, [position.x]);
 
   const handleClick = () => {
+    if (disabled) return;
     const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     setQuote(randomQuote);
     setShowSpeech(true);
@@ -54,9 +59,12 @@ export default function MayorCharacter() {
   };
 
   return (
-    <div ref={containerRef} className="absolute inset-0 pointer-events-none z-[9]">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 pointer-events-none z-[5]"
+    >
       <motion.div
-        className="absolute pointer-events-auto cursor-pointer"
+        className={`absolute ${disabled ? 'pointer-events-none' : 'pointer-events-auto'} cursor-pointer`}
         style={{ width: 48, height: 64 }}
         animate={{
           left: `${position.x}%`,
@@ -65,14 +73,14 @@ export default function MayorCharacter() {
           y: '-100%',
         }}
         transition={{
-          left: { duration: 3, ease: 'easeInOut' },
-          top: { duration: 3, ease: 'easeInOut' },
+          left: { duration: 6, ease: 'easeInOut' },
+          top: { duration: 6, ease: 'easeInOut' },
         }}
         onClick={handleClick}
       >
         {/* 말풍선 */}
         <AnimatePresence>
-          {showSpeech && (
+          {showSpeech && !disabled && (
             <motion.div
               initial={{ opacity: 0, y: 5, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -96,13 +104,15 @@ export default function MayorCharacter() {
             y: [0, -1, 0],
           }}
           transition={{
-            duration: isWalking ? 0.3 : 2,
+            duration: isWalking ? 0.5 : 3,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
           style={{
             transform: direction === 'left' ? 'scaleX(-1)' : 'scaleX(1)',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+            opacity: disabled ? 0.5 : 1,
+            transition: 'opacity 0.3s',
           }}
         >
           <CharacterSVG />
@@ -112,7 +122,12 @@ export default function MayorCharacter() {
   );
 }
 
-// 정명근 도트 캐릭터 SVG (단순 픽셀 아트 스타일)
+/**
+ * 정명근 도트 캐릭터 SVG (픽셀 아트)
+ * - 검은 머리 (깔끔한 2:8 가르마)
+ * - 안경
+ * - 네이비 수트, 흰 셔츠, 민주당 블루 넥타이
+ */
 function CharacterSVG() {
   return (
     <svg viewBox="0 0 32 42" width="48" height="64" shapeRendering="crispEdges">
@@ -122,6 +137,9 @@ function CharacterSVG() {
       <rect x="6" y="6" width="20" height="2" fill="#1a1a1a" />
       <rect x="6" y="8" width="2" height="2" fill="#1a1a1a" />
       <rect x="24" y="8" width="2" height="2" fill="#1a1a1a" />
+
+      {/* 이마 가르마 (살짝) */}
+      <rect x="14" y="4" width="2" height="2" fill="#2a2a2a" />
 
       {/* 얼굴 (살색) */}
       <rect x="8" y="8" width="16" height="2" fill="#F4C2A1" />
@@ -135,15 +153,29 @@ function CharacterSVG() {
       <rect x="9" y="11" width="3" height="1" fill="#1a1a1a" />
       <rect x="20" y="11" width="3" height="1" fill="#1a1a1a" />
 
-      {/* 눈 */}
+      {/* 안경 프레임 (검은색 뿔테) */}
+      {/* 왼쪽 렌즈 */}
+      <rect x="8" y="12" width="6" height="1" fill="#1a1a1a" />
+      <rect x="8" y="15" width="6" height="1" fill="#1a1a1a" />
+      <rect x="8" y="13" width="1" height="2" fill="#1a1a1a" />
+      <rect x="13" y="13" width="1" height="2" fill="#1a1a1a" />
+      {/* 오른쪽 렌즈 */}
+      <rect x="18" y="12" width="6" height="1" fill="#1a1a1a" />
+      <rect x="18" y="15" width="6" height="1" fill="#1a1a1a" />
+      <rect x="18" y="13" width="1" height="2" fill="#1a1a1a" />
+      <rect x="23" y="13" width="1" height="2" fill="#1a1a1a" />
+      {/* 코다리 */}
+      <rect x="14" y="13" width="4" height="1" fill="#1a1a1a" />
+
+      {/* 눈 (안경 안) */}
       <rect x="10" y="13" width="2" height="2" fill="#1a1a1a" />
       <rect x="20" y="13" width="2" height="2" fill="#1a1a1a" />
 
       {/* 코 */}
-      <rect x="15" y="15" width="2" height="1" fill="#D4A582" />
+      <rect x="15" y="16" width="2" height="1" fill="#D4A582" />
 
       {/* 입 (살짝 미소) */}
-      <rect x="13" y="17" width="6" height="1" fill="#8B4A3A" />
+      <rect x="13" y="18" width="6" height="1" fill="#8B4A3A" />
 
       {/* 목 */}
       <rect x="13" y="20" width="6" height="2" fill="#E8B594" />
@@ -159,9 +191,11 @@ function CharacterSVG() {
       <rect x="14" y="22" width="4" height="2" fill="#FFFFFF" />
       <rect x="15" y="24" width="2" height="2" fill="#FFFFFF" />
 
-      {/* 오렌지 넥타이 */}
-      <rect x="15" y="22" width="2" height="1" fill="#F58220" />
-      <rect x="15" y="25" width="2" height="3" fill="#F58220" />
+      {/* 민주당 블루 넥타이 */}
+      <rect x="15" y="22" width="2" height="1" fill="#004EA2" />
+      <rect x="15" y="25" width="2" height="3" fill="#004EA2" />
+      <rect x="14" y="27" width="4" height="2" fill="#004EA2" />
+      <rect x="14" y="29" width="4" height="1" fill="#003B7A" />
 
       {/* 팔 */}
       <rect x="4" y="24" width="2" height="6" fill="#1A3B8F" />

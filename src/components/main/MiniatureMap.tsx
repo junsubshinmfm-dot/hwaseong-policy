@@ -191,8 +191,8 @@ export default function MiniatureMap() {
               style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(253,224,71,0.06) 0%, transparent 50%)' }} />
           )}
 
-          {/* 정명근 도트 캐릭터 - 지도 위를 자유롭게 뛰어다님 */}
-          {!selected && <MayorCharacter />}
+          {/* 정명근 도트 캐릭터 - 지도 위를 자유롭게 뛰어다님 (오버레이 열렸을 때는 비활성) */}
+          <MayorCharacter disabled={!!selected} />
 
           {/* 권역 SVG 다각형 오버레이 */}
           <svg className="absolute inset-0 w-full h-full z-[6]" viewBox="0 0 100 100" preserveAspectRatio="none">
