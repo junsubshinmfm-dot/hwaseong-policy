@@ -61,7 +61,7 @@ export default function MayorCharacter({ disabled = false }: MayorCharacterProps
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 pointer-events-none z-[5]"
+      className="absolute inset-0 pointer-events-none z-[7]"
     >
       <motion.div
         className={`absolute w-7 h-10 sm:w-9 sm:h-12 lg:w-10 lg:h-14 ${disabled ? 'pointer-events-none' : 'pointer-events-auto'} cursor-pointer`}
