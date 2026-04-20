@@ -10,6 +10,7 @@ import { useSuggestionsByRegion } from '@/hooks/useSuggestions';
 import { useWeather } from '@/hooks/useWeather';
 import WeatherEffects from './WeatherEffects';
 import SkyBody from './SkyBody';
+import MayorCharacter from './MayorCharacter';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const CITY_IMAGE: string | null = `${BASE}/images/miniature-city.png`;
@@ -189,6 +190,9 @@ export default function MiniatureMap() {
             <div className="absolute inset-0 pointer-events-none"
               style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(253,224,71,0.06) 0%, transparent 50%)' }} />
           )}
+
+          {/* 정명근 도트 캐릭터 - 지도 위를 자유롭게 뛰어다님 */}
+          {!selected && <MayorCharacter />}
 
           {/* 권역 SVG 다각형 오버레이 */}
           <svg className="absolute inset-0 w-full h-full z-[6]" viewBox="0 0 100 100" preserveAspectRatio="none">
