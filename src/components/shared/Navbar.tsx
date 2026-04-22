@@ -37,7 +37,7 @@ export default function Navbar() {
             <img
               src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/jmg-logo.png?v=2`}
               alt="정명근 · 대한민국 1등 도시 화성"
-              className="w-auto object-contain h-10 sm:h-12 lg:h-14"
+              className="w-auto object-contain h-14 sm:h-16 lg:h-20"
             />
           </Link>
 
