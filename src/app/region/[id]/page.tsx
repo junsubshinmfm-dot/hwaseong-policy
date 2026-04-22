@@ -149,7 +149,7 @@ function RegionContent() {
         >
           <h2 className="text-navy/40 text-sm font-bold uppercase tracking-wider mb-4 ml-1 flex items-center gap-2">
             <span className="w-4 h-0.5 rounded-full bg-orange" />
-            좋아요 많은 정책제안
+            인기 정책제안
           </h2>
           <LikedSuggestionsCarousel
             suggestions={suggestions}
