@@ -29,13 +29,13 @@ export default function Navbar() {
 
       <div className="glass border-b border-navy-100/30">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-          {/* ── 로고: 화성특례시 공식 BI ── */}
-          <Link href="/main" className="shrink-0" style={{ marginLeft: '-40px' }}>
+          {/* ── 로고: 정명근 후보 BI ── */}
+          <Link href="/main" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/hwaseong-logo.png`}
-              alt="화성특례시"
-              className="w-auto object-contain h-[120px] sm:h-[180px] lg:h-[280px]"
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/jmg-logo.png`}
+              alt="정명근 · 대한민국 1등 도시 화성"
+              className="w-auto object-contain h-10 sm:h-12 lg:h-14"
             />
           </Link>
 

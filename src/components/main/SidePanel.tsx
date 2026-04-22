@@ -33,42 +33,37 @@ export default function SidePanel() {
   return (
     <div className="h-full flex flex-col gap-4">
       {/* 프로필 카드 */}
-      <div className="brand-card-navy p-6 relative overflow-hidden">
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full border-[4px] border-white/10 pointer-events-none" />
-        <div className="absolute -bottom-8 -left-8 w-20 h-20 rounded-full border-[4px] border-orange/20 pointer-events-none" />
-        <div className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-orange/20" />
+      <div className="rounded-2xl overflow-hidden shadow-sm bg-navy">
+        {/* 세로형 프로필 이미지 + 제안수 오버레이 */}
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/jmg-profile-vertical.png`}
+            alt="정명근 · 대한민국 1등 도시 화성"
+            className="block w-full h-auto"
+          />
 
-        <div className="relative flex items-center gap-4 mb-5">
-          <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0 border border-white/20">
-            <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
-              <path d="M10 38 A20 20 0 0 1 30 18" stroke="#F58220" strokeWidth="4" strokeLinecap="round" />
-              <path d="M10 38 A12 12 0 0 1 22 26" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
-              <rect x="30" y="10" width="10" height="10" rx="2.5" fill="#F58220" />
-            </svg>
+          {/* 제안 카운터 오버레이 (우측 하단) */}
+          <div className="absolute bottom-3 right-3 flex items-baseline gap-1.5
+                          px-3 py-2 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25">
+            <span className="text-orange text-3xl font-black leading-none">
+              {suggestions.length}
+            </span>
+            <span className="text-white/85 text-xs font-semibold">개 시민제안</span>
           </div>
-          <div>
-            <h2 className="text-white text-xl font-extrabold">정명근</h2>
-            <p className="text-white/60 text-sm">화성특례시장 후보</p>
-          </div>
         </div>
 
-        <div className="relative py-3 px-4 rounded-xl bg-white/10 border border-white/15">
-          <p className="text-orange-light text-sm font-bold text-center leading-relaxed whitespace-nowrap">
-            &ldquo;시민과 함께 만드는 화성의 미래&rdquo;
-          </p>
-        </div>
-
-        {/* 시민 제안 수 + 제안하기 버튼 */}
-        <div className="mt-5 flex items-baseline gap-2 justify-center">
-          <span className="text-5xl font-black text-orange">{suggestions.length}</span>
-          <span className="text-white/60 text-base font-medium">개 시민제안</span>
-        </div>
-
+        {/* 정책제안하기 버튼 */}
         <button
           onClick={() => router.push('/suggestions/new')}
-          className="w-full mt-4 py-2.5 rounded-xl text-sm font-bold text-navy bg-white/90
-                     hover:bg-white hover:shadow-lg transition-all"
+          className="w-full py-3 text-sm font-bold text-white bg-orange
+                     hover:bg-orange/90 active:bg-orange/80 transition-colors
+                     flex items-center justify-center gap-2"
         >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+          </svg>
           정책 제안하기
         </button>
       </div>

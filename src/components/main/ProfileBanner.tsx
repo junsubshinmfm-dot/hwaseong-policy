@@ -1,41 +1,47 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useSuggestions } from '@/hooks/useSuggestions';
 
 export default function ProfileBanner() {
+  const router = useRouter();
   const { suggestions } = useSuggestions();
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   return (
-    <div className="mx-2 sm:mx-4 mt-2 mb-3 relative overflow-hidden rounded-2xl"
-      style={{ background: 'linear-gradient(135deg, #1A3B8F 0%, #152F73 60%, #0D1F4D 100%)' }}>
-      <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full border-[3px] border-white/[0.08]" />
-      <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full border-[3px] border-orange/15" />
-      <div className="absolute top-2 right-3 w-6 h-6 rounded-lg bg-orange/15" />
+    <div className="mx-2 sm:mx-4 mt-2 mb-3 rounded-2xl overflow-hidden shadow-sm">
+      {/* 가로형 프로필 이미지 + 제안수 오버레이 */}
+      <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${basePath}/images/jmg-profile-horizontal.png`}
+          alt="정명근 · 대한민국 1등 도시 화성"
+          className="block w-full h-auto"
+        />
 
-      <div className="relative flex items-center gap-3 px-4 py-3">
-        <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0 border border-white/15">
-          <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none">
-            <path d="M10 38 A20 20 0 0 1 30 18" stroke="#F58220" strokeWidth="4" strokeLinecap="round" />
-            <path d="M10 38 A12 12 0 0 1 22 26" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
-            <rect x="30" y="10" width="10" height="10" rx="2.5" fill="#F58220" />
-          </svg>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-2">
-            <span className="text-white font-extrabold text-base">정명근</span>
-            <span className="text-white/40 text-xs">화성특례시장 후보</span>
-          </div>
-          <p className="text-orange-light text-xs font-bold truncate">
-            &ldquo;시민과 함께 만드는 화성의 미래&rdquo;
-          </p>
-        </div>
-
-        <div className="text-right shrink-0">
-          <span className="text-orange text-2xl font-black">{suggestions.length}</span>
-          <span className="text-white/40 text-xs ml-0.5">제안</span>
+        {/* 제안 카운터 오버레이 (우측) */}
+        <div className="absolute top-1/2 right-3 -translate-y-1/2 flex items-baseline gap-1.5
+                        px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25">
+          <span className="text-orange text-xl font-black leading-none">
+            {suggestions.length}
+          </span>
+          <span className="text-white/85 text-[11px] font-semibold">개 시민제안</span>
         </div>
       </div>
+
+      {/* 정책제안하기 버튼 */}
+      <button
+        onClick={() => router.push('/suggestions/new')}
+        className="w-full py-2.5 text-sm font-bold text-white bg-orange
+                   hover:bg-orange/90 active:bg-orange/80 transition-colors
+                   flex items-center justify-center gap-1.5"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+        </svg>
+        정책 제안하기
+      </button>
     </div>
   );
 }
