@@ -49,10 +49,10 @@ export default function SidePanel() {
               시민제안
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-orange text-8xl font-black leading-none drop-shadow-[0_2px_10px_rgba(245,130,32,0.45)]">
+              <span className="text-orange text-[10rem] font-black leading-none drop-shadow-[0_2px_12px_rgba(245,130,32,0.5)]">
                 {suggestions.length}
               </span>
-              <span className="text-white text-2xl font-extrabold">개</span>
+              <span className="text-white text-3xl font-extrabold">개</span>
             </div>
           </div>
         </div>
