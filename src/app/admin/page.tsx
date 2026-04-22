@@ -10,7 +10,13 @@ import {
   updateSuggestion,
   submitSuggestion,
 } from '@/lib/suggestions';
+import {
+  subscribeAllFeedbacks,
+  markFeedbackViewed,
+  deleteFeedback,
+} from '@/lib/feedbacks';
 import type { Suggestion } from '@/types/suggestion';
+import type { Feedback } from '@/types/feedback';
 
 const ADMIN_PASSWORD = '6517';
 const categoryEntries = Object.entries(CATEGORIES) as [CategoryKey, (typeof CATEGORIES)[CategoryKey]][];
@@ -20,7 +26,9 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [tab, setTab] = useState<'suggestions' | 'feedbacks'>('suggestions');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
   const [processing, setProcessing] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -43,6 +51,31 @@ export default function AdminPage() {
     const unsubscribe = subscribeAllSuggestions((data) => setSuggestions(data));
     return () => { unsubscribe?.(); };
   }, [authenticated]);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    const unsubscribe = subscribeAllFeedbacks((data) => setFeedbacks(data));
+    return () => { unsubscribe?.(); };
+  }, [authenticated]);
+
+  const feedbackUnreadCount = useMemo(
+    () => feedbacks.filter((f) => !f.viewed).length,
+    [feedbacks]
+  );
+
+  const handleToggleFeedbackViewed = async (id: string, viewed: boolean) => {
+    setProcessing(id);
+    await markFeedbackViewed(id, viewed);
+    setProcessing(null);
+  };
+
+  const handleDeleteFeedback = async (id: string) => {
+    if (!confirm('이 건의를 삭제하시겠습니까? 복구할 수 없습니다.')) return;
+    setProcessing(id);
+    await deleteFeedback(id);
+    setProcessing(null);
+    setExpandedId(null);
+  };
 
   const filtered = useMemo(() => {
     if (filter === 'all') return suggestions;
@@ -185,19 +218,23 @@ export default function AdminPage() {
       <div className="bg-navy text-white">
         <div className="max-w-5xl mx-auto px-4 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">정책제안 관리</h1>
-            <p className="text-white/50 text-sm mt-1">시민 정책제안을 검토, 수정, 등록합니다</p>
+            <h1 className="text-2xl font-bold">관리자 대시보드</h1>
+            <p className="text-white/50 text-sm mt-1">
+              {tab === 'suggestions' ? '시민 정책제안을 검토, 수정, 등록합니다' : '캠프로 들어온 건의사항을 확인합니다'}
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowUploadForm(true)}
-              className="px-4 py-2 rounded-xl bg-orange text-white text-sm font-bold hover:bg-orange-dark transition-colors flex items-center gap-1.5"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              새 제안 등록
-            </button>
+            {tab === 'suggestions' && (
+              <button
+                onClick={() => setShowUploadForm(true)}
+                className="px-4 py-2 rounded-xl bg-orange text-white text-sm font-bold hover:bg-orange-dark transition-colors flex items-center gap-1.5"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                새 제안 등록
+              </button>
+            )}
             <button
               onClick={() => { setAuthenticated(false); sessionStorage.removeItem('admin_auth'); }}
               className="px-4 py-2 rounded-xl bg-white/10 text-white/70 text-sm font-medium hover:bg-white/20 transition-colors"
@@ -206,9 +243,36 @@ export default function AdminPage() {
             </button>
           </div>
         </div>
+
+        {/* 상단 탭 */}
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex gap-1">
+            <button
+              onClick={() => { setTab('suggestions'); setExpandedId(null); }}
+              className={`px-5 py-3 rounded-t-xl text-sm font-bold transition-colors ${
+                tab === 'suggestions' ? 'bg-[#F4F5F9] text-navy' : 'text-white/60 hover:text-white'
+              }`}
+            >
+              정책제안 <span className="ml-1 opacity-60">{suggestions.length}</span>
+            </button>
+            <button
+              onClick={() => { setTab('feedbacks'); setExpandedId(null); }}
+              className={`px-5 py-3 rounded-t-xl text-sm font-bold transition-colors flex items-center gap-1.5 ${
+                tab === 'feedbacks' ? 'bg-[#F4F5F9] text-navy' : 'text-white/60 hover:text-white'
+              }`}
+            >
+              건의사항 <span className="opacity-60">{feedbacks.length}</span>
+              {feedbackUnreadCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-orange text-white text-[10px] font-bold">
+                  NEW {feedbackUnreadCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6" hidden={tab !== 'suggestions'}>
         {/* 새 제안 등록 폼 */}
         <AnimatePresence>
           {showUploadForm && (
@@ -514,6 +578,136 @@ export default function AdminPage() {
                                   </button>
                                 </div>
                               )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
+
+      {/* 건의사항 탭 */}
+      <div className="max-w-5xl mx-auto px-4 py-6" hidden={tab !== 'feedbacks'}>
+        {feedbacks.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-navy/[0.06] p-12 text-center">
+            <p className="text-navy/30 text-base">접수된 건의사항이 없습니다</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <AnimatePresence>
+              {feedbacks.map((fb) => {
+                const date = new Date(fb.createdAt);
+                const dateStr = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                const isExpanded = expandedId === fb.id;
+                const isProcessing = processing === fb.id;
+
+                return (
+                  <motion.div
+                    key={fb.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className={`bg-white rounded-2xl border shadow-sm overflow-hidden ${
+                      !fb.viewed ? 'border-orange/40 ring-1 ring-orange/20' : 'border-navy/[0.06]'
+                    }`}
+                  >
+                    <div
+                      className="p-4 cursor-pointer hover:bg-navy-50/30 transition-colors"
+                      onClick={async () => {
+                        const nextExpanded = isExpanded ? null : fb.id;
+                        setExpandedId(nextExpanded);
+                        if (!isExpanded && !fb.viewed) {
+                          await markFeedbackViewed(fb.id, true);
+                        }
+                      }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${
+                          !fb.viewed ? 'bg-orange' : 'bg-navy/20'
+                        }`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <h3 className="text-navy font-bold text-base">{fb.title}</h3>
+                            {!fb.viewed && (
+                              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-orange/10 text-orange">
+                                NEW
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-navy/35">
+                            <span>{fb.realName}</span>
+                            <span>{fb.phone}</span>
+                            <span>{dateStr}</span>
+                          </div>
+                        </div>
+                        <svg className={`w-5 h-5 text-navy/20 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 pt-0 border-t border-navy/[0.06]">
+                            <div className="pt-4 space-y-4">
+                              <div className="p-3 rounded-xl bg-orange/5 border border-orange/20">
+                                <p className="text-orange text-[10px] font-bold uppercase mb-2 flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                  </svg>
+                                  연락처 (관리자 전용)
+                                </p>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                  <div>
+                                    <span className="text-navy/40 text-xs">이름: </span>
+                                    <span className="text-navy font-bold">{fb.realName}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-navy/40 text-xs">전화: </span>
+                                    <a href={`tel:${fb.phone}`} className="text-navy font-bold hover:text-orange transition-colors">
+                                      {fb.phone}
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <p className="text-navy/40 text-xs font-bold uppercase mb-1">건의 내용</p>
+                                <p className="text-navy text-sm leading-relaxed whitespace-pre-wrap">{fb.content}</p>
+                              </div>
+
+                              <div className="flex items-center gap-2 pt-2 border-t border-navy/[0.06] flex-wrap">
+                                <button
+                                  onClick={() => handleToggleFeedbackViewed(fb.id, !fb.viewed)}
+                                  disabled={isProcessing}
+                                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors disabled:opacity-50 ${
+                                    fb.viewed
+                                      ? 'bg-navy/10 text-navy hover:bg-navy/20'
+                                      : 'bg-green-500 text-white hover:bg-green-600'
+                                  }`}
+                                >
+                                  {isProcessing ? '처리 중...' : fb.viewed ? '미확인으로 돌리기' : '확인 완료'}
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteFeedback(fb.id)}
+                                  disabled={isProcessing}
+                                  className="px-4 py-2 rounded-xl border border-red-200 text-red-400 text-sm font-bold hover:bg-red-50 transition-colors disabled:opacity-50 ml-auto"
+                                >
+                                  삭제
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </motion.div>
