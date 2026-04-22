@@ -10,33 +10,31 @@ export default function ProfileBanner() {
 
   return (
     <div className="mx-2 sm:mx-4 mt-2 mb-3 rounded-2xl overflow-hidden shadow-sm bg-navy">
-      {/* 세로형 프로필 이미지 */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`${basePath}/images/jmg-profile-vertical.png`}
-        alt="정명근 · 대한민국 1등 도시 화성"
-        className="block w-full h-auto"
-      />
+      {/* 가로형 프로필 이미지 + 제안수 오버레이 (상하 네이비 여백으로 높이 확장) */}
+      <div className="relative py-5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${basePath}/images/jmg-profile-horizontal.png`}
+          alt="정명근 · 대한민국 1등 도시 화성"
+          className="block w-full h-auto"
+        />
 
-      {/* 제안 카운터 (이미지 아래 네이비 섹션, 카드 세로 길이 확장) */}
-      <div className="px-5 pt-4 pb-5">
-        <div className="text-white/80 text-xs font-bold tracking-wider mb-1.5">
-          시민제안
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-orange text-[7rem] font-black leading-none drop-shadow-[0_2px_10px_rgba(245,130,32,0.45)]">
+        {/* 제안 카운터 오버레이 (우측) */}
+        <div className="absolute top-1/2 right-3 -translate-y-1/2 flex items-baseline gap-1.5
+                        px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25">
+          <span className="text-orange text-xl font-black leading-none">
             {suggestions.length}
           </span>
-          <span className="text-white text-2xl font-extrabold">개</span>
+          <span className="text-white/85 text-[11px] font-semibold">개 시민제안</span>
         </div>
       </div>
 
       {/* 정책제안하기 버튼 */}
       <button
         onClick={() => router.push('/suggestions/new')}
-        className="w-full py-3 text-sm font-bold text-white bg-orange
+        className="w-full py-2.5 text-sm font-bold text-white bg-orange
                    hover:bg-orange/90 active:bg-orange/80 transition-colors
-                   flex items-center justify-center gap-2"
+                   flex items-center justify-center gap-1.5"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
