@@ -28,7 +28,7 @@ export default function Navbar() {
       </div>
 
       <div className="glass border-b border-navy-100/30">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="px-4 sm:px-6 h-14 flex items-center justify-between">
           {/* ── 로고: 정명근 후보 BI ── */}
           <Link href="/main" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}

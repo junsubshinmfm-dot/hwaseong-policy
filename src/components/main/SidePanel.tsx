@@ -43,13 +43,17 @@ export default function SidePanel() {
             className="block w-full h-auto"
           />
 
-          {/* 제안 카운터 오버레이 (우측 하단) */}
-          <div className="absolute bottom-3 right-3 flex items-baseline gap-1.5
-                          px-3 py-2 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25">
-            <span className="text-orange text-3xl font-black leading-none">
-              {suggestions.length}
-            </span>
-            <span className="text-white/85 text-xs font-semibold">개 시민제안</span>
+          {/* 제안 카운터 오버레이 (좌측 하단, 큰 사이즈) */}
+          <div className="absolute bottom-4 left-4">
+            <div className="text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
+              시민제안
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-orange text-6xl font-black leading-none drop-shadow-[0_2px_8px_rgba(245,130,32,0.4)]">
+                {suggestions.length}
+              </span>
+              <span className="text-white text-lg font-extrabold">개</span>
+            </div>
           </div>
         </div>
 
