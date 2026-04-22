@@ -15,6 +15,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [regionDropdown, setRegionDropdown] = useState(false);
   const [categoryDropdown, setCategoryDropdown] = useState(false);
+  const [mobileRegionOpen, setMobileRegionOpen] = useState(false);
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
 
   const isActive = (path: string) =>
     pathname === path || pathname.startsWith(path + '/');
@@ -33,7 +35,7 @@ export default function Navbar() {
           <Link href="/main" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/jmg-logo.png`}
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/images/jmg-logo.png?v=2`}
               alt="정명근 · 대한민국 1등 도시 화성"
               className="w-auto object-contain h-10 sm:h-12 lg:h-14"
             />
@@ -254,26 +256,76 @@ export default function Navbar() {
                 지도
               </Link>
 
-              <div className="px-4 py-2 text-xs text-navy/30 uppercase tracking-wider font-bold">권역</div>
-              {regionEntries.map(([id, region]) => (
-                <Link key={id} href={`/region/${id}`} onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 px-6 py-3 rounded-xl text-base font-medium ${
-                    pathname === `/region/${id}` ? 'bg-navy-50 text-navy' : 'text-gray-600'
-                  }`}>
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: region.color }} />
-                  {region.label}
-                </Link>
-              ))}
+              {/* 권역 아코디언 */}
+              <button
+                onClick={() => setMobileRegionOpen(!mobileRegionOpen)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-semibold transition-colors ${
+                  isActive('/region') ? 'bg-navy text-white' : 'text-gray-600 hover:bg-navy-50'
+                }`}
+              >
+                <span>권역</span>
+                <svg className={`w-4 h-4 transition-transform ${mobileRegionOpen ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <AnimatePresence>
+                {mobileRegionOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-3 space-y-1 pt-1">
+                      {regionEntries.map(([id, region]) => (
+                        <Link key={id} href={`/region/${id}`} onClick={() => setMobileOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium ${
+                            pathname === `/region/${id}` ? 'bg-navy-50 text-navy' : 'text-gray-600 hover:bg-navy-50'
+                          }`}>
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: region.color }} />
+                          {region.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              <div className="px-4 py-2 text-xs text-orange/50 uppercase tracking-wider font-bold">카테고리</div>
-              {categoryEntries.map(([key, cat]) => (
-                <button key={key}
-                  onClick={() => { setMobileOpen(false); router.push(`/search?category=${key}`); }}
-                  className="w-full flex items-center gap-3 px-6 py-3 rounded-xl text-base font-medium text-gray-600 hover:bg-navy-50">
-                  <span className="text-base">{cat.icon}</span>
-                  {cat.label}
-                </button>
-              ))}
+              {/* 카테고리 아코디언 */}
+              <button
+                onClick={() => setMobileCategoryOpen(!mobileCategoryOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-semibold text-gray-600 hover:bg-navy-50 transition-colors"
+              >
+                <span>카테고리</span>
+                <svg className={`w-4 h-4 transition-transform ${mobileCategoryOpen ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <AnimatePresence>
+                {mobileCategoryOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-3 space-y-1 pt-1">
+                      {categoryEntries.map(([key, cat]) => (
+                        <button key={key}
+                          onClick={() => { setMobileOpen(false); router.push(`/search?category=${key}`); }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-navy-50">
+                          <span>{cat.icon}</span>
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <Link href="/suggestions/new" onClick={() => setMobileOpen(false)}
                 className={`block px-4 py-3 rounded-xl text-base font-semibold ${isActive('/suggestions') ? 'bg-orange text-white' : 'text-gray-600'}`}>
@@ -283,11 +335,6 @@ export default function Navbar() {
               <Link href="/feedback/new" onClick={() => setMobileOpen(false)}
                 className={`block px-4 py-3 rounded-xl text-base font-semibold ${isActive('/feedback') ? 'bg-orange text-white' : 'text-gray-600'}`}>
                 건의합니다
-              </Link>
-
-              <Link href="/search" onClick={() => setMobileOpen(false)}
-                className={`block px-4 py-3 rounded-xl text-base font-semibold ${isActive('/search') ? 'bg-navy text-white' : 'text-gray-600'}`}>
-                검색
               </Link>
             </div>
           </motion.div>

@@ -14,7 +14,7 @@ export default function ProfileBanner() {
       <div className="relative py-5">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`${basePath}/images/jmg-profile-horizontal.png`}
+          src={`${basePath}/images/jmg-profile-horizontal.png?v=2`}
           alt="정명근 · 대한민국 1등 도시 화성"
           className="block w-full h-auto"
         />
