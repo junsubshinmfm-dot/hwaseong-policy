@@ -10,8 +10,8 @@ export default function ProfileBanner() {
 
   return (
     <div className="mx-2 sm:mx-4 mt-2 mb-3 rounded-2xl overflow-hidden shadow-sm bg-navy">
-      {/* 가로형 프로필 이미지 + 제안수 오버레이 (상하 네이비 여백으로 높이 확장) */}
-      <div className="relative py-5">
+      {/* 가로형 프로필 이미지 + 제안수 오버레이 */}
+      <div className="relative">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`${basePath}/images/jmg-profile-horizontal.png?v=2`}
@@ -20,12 +20,12 @@ export default function ProfileBanner() {
         />
 
         {/* 제안 카운터 오버레이 (우측) */}
-        <div className="absolute top-1/2 right-3 -translate-y-1/2 flex items-baseline gap-1.5
-                        px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25">
-          <span className="text-orange text-xl font-black leading-none">
+        <div className="absolute top-1/2 right-4 -translate-y-1/2 flex items-baseline gap-1.5">
+          <span className="text-white/90 text-xs font-semibold">시민제안</span>
+          <span className="text-orange text-2xl font-black leading-none">
             {suggestions.length}
           </span>
-          <span className="text-white/85 text-[11px] font-semibold">개 시민제안</span>
+          <span className="text-white/90 text-xs font-semibold">개</span>
         </div>
       </div>
 
