@@ -8,7 +8,7 @@ import { useRegionData } from '@/hooks/useRegionData';
 import { useSuggestionsByRegion } from '@/hooks/useSuggestions';
 import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
-import Dashboard from '@/components/region/Dashboard';
+import LikedSuggestionsCarousel from '@/components/region/LikedSuggestionsCarousel';
 import FilterTabs from '@/components/region/FilterTabs';
 import SuggestionGrid from '@/components/suggestion/SuggestionGrid';
 import SuggestionModal from '@/components/suggestion/SuggestionModal';
@@ -140,7 +140,7 @@ function RegionContent() {
 
       {/* ── 콘텐츠 영역 ── */}
       <div className="relative z-10 px-4 md:px-8 max-w-[1600px] mx-auto pb-12">
-        {/* 대시보드 */}
+        {/* 인기 정책제안 캐러셀 */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -149,9 +149,12 @@ function RegionContent() {
         >
           <h2 className="text-navy/40 text-sm font-bold uppercase tracking-wider mb-4 ml-1 flex items-center gap-2">
             <span className="w-4 h-0.5 rounded-full bg-orange" />
-            데이터 대시보드
+            좋아요 많은 정책제안
           </h2>
-          <Dashboard stats={region.stats} regionColor={regionMeta.color} />
+          <LikedSuggestionsCarousel
+            suggestions={suggestions}
+            onCardClick={setSelectedSuggestion}
+          />
         </motion.section>
 
         {/* 시민 정책제안 */}
