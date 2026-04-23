@@ -79,14 +79,14 @@ export default function SuggestionCard({ suggestion, onClick }: SuggestionCardPr
           {suggestion.content}
         </p>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: catColor }} />
-            <span className="text-navy/20 text-[10px] font-bold">{regionMeta?.label}</span>
-            <span className="text-navy/15 text-[10px]">|</span>
-            <span className="text-navy/25 text-[10px]">{suggestion.nickname}</span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: catColor }} />
+            <span className="text-navy/20 text-[10px] font-bold whitespace-nowrap shrink-0">{regionMeta?.label}</span>
+            <span className="text-navy/15 text-[10px] shrink-0">|</span>
+            <span className="text-navy/25 text-[10px] truncate">{suggestion.nickname}</span>
           </div>
-          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-1 shrink-0 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
             <ReportButton suggestionId={suggestion.id} />
             <SuggestionLikeButton suggestionId={suggestion.id} initialLikes={suggestion.likes} size="sm" />
           </div>
