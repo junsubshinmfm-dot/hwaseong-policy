@@ -125,12 +125,6 @@ function RegionContent() {
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 backdrop-blur-sm text-white/80 text-sm font-semibold">
                     {suggestions.length}개 시민제안
                   </span>
-                  <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 backdrop-blur-sm text-white/80 text-sm font-semibold">
-                    인구 {(region.stats.population.total / 10000).toFixed(1)}만명
-                  </span>
-                  <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 backdrop-blur-sm text-white/80 text-sm font-semibold">
-                    사업체 {region.stats.economy.businesses.toLocaleString()}개
-                  </span>
                 </div>
               </div>
             </div>
