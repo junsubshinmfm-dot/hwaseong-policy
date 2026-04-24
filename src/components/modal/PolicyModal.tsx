@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import CategoryTag from '@/components/shared/CategoryTag';
 import ShareButtons from '@/components/shared/ShareButtons';
 import LikeButton from '@/components/shared/LikeButton';
+import { usePolicyView } from '@/hooks/usePolicyView';
 import { REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
 
 interface Policy {
@@ -36,6 +37,7 @@ const categoryIcons: Record<string, string> = {
 
 export default function PolicyModal({ policy, onClose }: PolicyModalProps) {
   const regionMeta = REGIONS[policy.region as RegionKey];
+  const viewCount = usePolicyView(policy.id);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -168,7 +170,16 @@ export default function PolicyModal({ policy, onClose }: PolicyModalProps) {
 
             <div className="flex items-center justify-between">
               <ShareButtons title={policy.title} description={policy.summary} url={shareUrl} />
-              <LikeButton policyId={policy.id} size="md" />
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-navy-50 text-navy/50 border border-navy-100/40 text-base">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span className="font-medium">{viewCount.toLocaleString()}</span>
+                </div>
+                <LikeButton policyId={policy.id} size="md" />
+              </div>
             </div>
           </div>
         </div>

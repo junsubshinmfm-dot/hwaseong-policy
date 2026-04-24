@@ -23,6 +23,13 @@
       ".read": true,
       ".write": true
     },
+    "views": {
+      "$policyId": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.isNumber() && newData.val() >= 0"
+      }
+    },
     "$other": {
       ".read": false,
       ".write": false

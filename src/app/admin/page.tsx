@@ -15,13 +15,43 @@ import {
   markFeedbackViewed,
   deleteFeedback,
 } from '@/lib/feedbacks';
-import { subscribeVisitorStats, type VisitorStats } from '@/lib/analytics';
+import { subscribeVisitorStats, subscribeAllPolicyViews, type VisitorStats } from '@/lib/analytics';
+import policiesData from '@/data/policies.json';
 import type { Suggestion } from '@/types/suggestion';
 import type { Feedback } from '@/types/feedback';
 
 const ADMIN_PASSWORD = '6517';
 const categoryEntries = Object.entries(CATEGORIES) as [CategoryKey, (typeof CATEGORIES)[CategoryKey]][];
 const regionEntries = Object.entries(REGIONS) as [RegionKey, (typeof REGIONS)[RegionKey]][];
+
+function formatDuration(seconds: number): string {
+  if (!seconds || seconds < 0) return '0초';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}시간 ${m}분`;
+  if (m > 0) return `${m}분 ${s}초`;
+  return `${s}초`;
+}
+
+const PAGE_LABELS: Record<string, string> = {
+  '/': '홈',
+  '/main': '메인',
+  '/search': '검색',
+  '/feedback': '건의하기',
+  '/suggestions': '정책제안 목록',
+  '/suggestions/new': '정책제안 작성',
+};
+
+function labelForPath(path: string): string {
+  if (PAGE_LABELS[path]) return PAGE_LABELS[path];
+  if (path.startsWith('/region/')) {
+    const key = path.replace('/region/', '');
+    return REGIONS[key as RegionKey]?.label ? `권역 · ${REGIONS[key as RegionKey].label}` : `권역 · ${key}`;
+  }
+  if (path.startsWith('/suggestions/')) return '정책제안 상세';
+  return path;
+}
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -31,6 +61,7 @@ export default function AdminPage() {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
+  const [policyViews, setPolicyViews] = useState<Record<string, number>>({});
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
   const [processing, setProcessing] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -63,6 +94,12 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authenticated) return;
     const unsubscribe = subscribeVisitorStats((data) => setVisitorStats(data));
+    return () => { unsubscribe?.(); };
+  }, [authenticated]);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    const unsubscribe = subscribeAllPolicyViews((data) => setPolicyViews(data));
     return () => { unsubscribe?.(); };
   }, [authenticated]);
 
@@ -795,6 +832,46 @@ export default function AdminPage() {
               </div>
             </div>
 
+            {/* 참여 지표 카드 */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                <p className="text-navy/50 text-xs font-bold uppercase tracking-wide mb-2">평균 체류시간</p>
+                <p className="text-navy text-3xl font-bold tabular-nums">
+                  {formatDuration(visitorStats.todayAvgSessionSeconds)}
+                </p>
+                <p className="text-navy/30 text-xs mt-1">
+                  누적 평균 {formatDuration(visitorStats.avgSessionSeconds)}
+                </p>
+              </div>
+              <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                <p className="text-navy/50 text-xs font-bold uppercase tracking-wide mb-2">이탈률 (오늘)</p>
+                <p className="text-navy text-3xl font-bold tabular-nums">
+                  {visitorStats.todayBounceRate}%
+                </p>
+                <p className="text-navy/30 text-xs mt-1">
+                  누적 {visitorStats.bounceRate}%
+                </p>
+              </div>
+              <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                <p className="text-navy/50 text-xs font-bold uppercase tracking-wide mb-2">오늘 세션</p>
+                <p className="text-navy text-3xl font-bold tabular-nums">
+                  {visitorStats.todaySessions.toLocaleString()}
+                </p>
+                <p className="text-navy/30 text-xs mt-1">
+                  누적 {visitorStats.totalSessions.toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                <p className="text-navy/50 text-xs font-bold uppercase tracking-wide mb-2">페이지/세션</p>
+                <p className="text-navy text-3xl font-bold tabular-nums">
+                  {visitorStats.totalSessions > 0
+                    ? (visitorStats.total / visitorStats.totalSessions).toFixed(1)
+                    : '0.0'}
+                </p>
+                <p className="text-navy/30 text-xs mt-1">평균 페이지뷰 수</p>
+              </div>
+            </div>
+
             {/* 일별 추이 */}
             <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
@@ -834,6 +911,206 @@ export default function AdminPage() {
                   })()}
                 </div>
               )}
+            </div>
+
+            {/* 인기 페이지 */}
+            <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-navy font-bold text-lg">인기 페이지</h2>
+                <p className="text-navy/30 text-xs">조회수 · 평균 체류시간</p>
+              </div>
+              {visitorStats.topPages.length === 0 ? (
+                <p className="text-navy/30 text-sm text-center py-8">데이터가 없습니다</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {(() => {
+                    const rows = visitorStats.topPages.slice(0, 15);
+                    const maxCount = Math.max(...rows.map((r) => r.count), 1);
+                    return rows.map((row) => (
+                      <div key={row.path} className="flex items-center gap-3 py-1.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-navy text-sm font-bold truncate">{labelForPath(row.path)}</p>
+                          <p className="text-navy/35 text-[10px] font-mono truncate">{row.path}</p>
+                        </div>
+                        <div className="w-24 sm:w-40 shrink-0 relative h-2 bg-navy-50 rounded-full overflow-hidden">
+                          <div
+                            className="absolute inset-y-0 left-0 bg-navy/70 rounded-full"
+                            style={{ width: `${Math.max((row.count / maxCount) * 100, 2)}%` }}
+                          />
+                        </div>
+                        <span className="text-navy text-sm font-bold tabular-nums w-14 text-right shrink-0">
+                          {row.count.toLocaleString()}
+                        </span>
+                        <span className="text-navy/40 text-xs tabular-nums w-14 text-right shrink-0 hidden sm:inline">
+                          {formatDuration(row.avgSeconds)}
+                        </span>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* 정책 TOP 10 */}
+            <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-navy font-bold text-lg">정책 조회수 TOP 10</h2>
+                <p className="text-navy/30 text-xs">정책 카드 열람 순위</p>
+              </div>
+              {Object.keys(policyViews).length === 0 ? (
+                <p className="text-navy/30 text-sm text-center py-8">데이터가 없습니다</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {(() => {
+                    const policies = policiesData as Array<{ id: number; title: string; category: string }>;
+                    const policyMap = new Map(policies.map((p) => [String(p.id), p]));
+                    const rows = Object.entries(policyViews)
+                      .map(([id, count]) => ({
+                        id,
+                        count: typeof count === 'number' ? count : 0,
+                        title: policyMap.get(id)?.title || `정책 #${id}`,
+                      }))
+                      .sort((a, b) => b.count - a.count)
+                      .slice(0, 10);
+                    const maxCount = Math.max(...rows.map((r) => r.count), 1);
+                    return rows.map((row, idx) => (
+                      <div key={row.id} className="flex items-center gap-3 py-1.5">
+                        <span className="text-navy/30 text-xs font-bold tabular-nums w-5 shrink-0">
+                          {idx + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-navy text-sm font-bold truncate">{row.title}</p>
+                          <p className="text-navy/35 text-[10px]">정책 #{row.id}</p>
+                        </div>
+                        <div className="w-24 sm:w-40 shrink-0 relative h-2 bg-navy-50 rounded-full overflow-hidden">
+                          <div
+                            className="absolute inset-y-0 left-0 bg-orange rounded-full"
+                            style={{ width: `${Math.max((row.count / maxCount) * 100, 2)}%` }}
+                          />
+                        </div>
+                        <span className="text-navy text-sm font-bold tabular-nums w-14 text-right shrink-0">
+                          {row.count.toLocaleString()}
+                        </span>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* 디바이스 / OS / 브라우저 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {([
+                { title: '디바이스', data: visitorStats.devices },
+                { title: 'OS', data: visitorStats.os },
+                { title: '브라우저', data: visitorStats.browsers },
+              ]).map(({ title, data }) => {
+                const rows = Object.entries(data).sort((a, b) => b[1] - a[1]);
+                const total = rows.reduce((acc, [, v]) => acc + v, 0);
+                return (
+                  <div key={title} className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                    <h2 className="text-navy font-bold text-base mb-3">{title}</h2>
+                    {rows.length === 0 ? (
+                      <p className="text-navy/30 text-xs py-4">데이터 없음</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {rows.slice(0, 6).map(([name, count]) => {
+                          const pct = total > 0 ? (count / total) * 100 : 0;
+                          return (
+                            <div key={name}>
+                              <div className="flex items-center justify-between text-xs mb-1">
+                                <span className="text-navy font-semibold">{name}</span>
+                                <span className="text-navy/50 tabular-nums">
+                                  {count.toLocaleString()} ({pct.toFixed(1)}%)
+                                </span>
+                              </div>
+                              <div className="relative h-1.5 bg-navy-50 rounded-full overflow-hidden">
+                                <div
+                                  className="absolute inset-y-0 left-0 bg-navy rounded-full"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 유입경로 */}
+            <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-navy font-bold text-lg">유입경로</h2>
+                <p className="text-navy/30 text-xs">세션 기준 상위 15개</p>
+              </div>
+              {Object.keys(visitorStats.referrers).length === 0 ? (
+                <p className="text-navy/30 text-sm text-center py-8">데이터가 없습니다</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {(() => {
+                    const rows = Object.entries(visitorStats.referrers)
+                      .sort((a, b) => b[1] - a[1])
+                      .slice(0, 15);
+                    const total = rows.reduce((acc, [, v]) => acc + v, 0);
+                    const maxCount = Math.max(...rows.map(([, v]) => v), 1);
+                    return rows.map(([name, count]) => {
+                      const pct = total > 0 ? (count / total) * 100 : 0;
+                      return (
+                        <div key={name} className="flex items-center gap-3 py-1">
+                          <span className="text-navy text-sm font-bold flex-1 min-w-0 truncate">{name}</span>
+                          <div className="w-24 sm:w-40 shrink-0 relative h-2 bg-navy-50 rounded-full overflow-hidden">
+                            <div
+                              className="absolute inset-y-0 left-0 bg-navy/60 rounded-full"
+                              style={{ width: `${Math.max((count / maxCount) * 100, 2)}%` }}
+                            />
+                          </div>
+                          <span className="text-navy text-sm font-bold tabular-nums w-14 text-right shrink-0">
+                            {count.toLocaleString()}
+                          </span>
+                          <span className="text-navy/40 text-xs tabular-nums w-12 text-right shrink-0 hidden sm:inline">
+                            {pct.toFixed(1)}%
+                          </span>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* GA4 지역 리포트 안내 */}
+            <div className="bg-gradient-to-br from-navy to-navy-dark text-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="font-bold text-base mb-1">지역별 방문 통계</h2>
+                  <p className="text-white/70 text-sm mb-3">
+                    국가·시·도 단위 지역 분석은 정확한 IP 지오로케이션이 필요해, Google Analytics 4에서 확인하시는 것이 정확합니다.
+                  </p>
+                  <a
+                    href="https://analytics.google.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-navy text-xs font-bold hover:bg-white/90 transition-colors"
+                  >
+                    GA4 대시보드 열기
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                  <p className="text-white/40 text-[10px] mt-2">
+                    Reports → User attributes → Demographics details → Country/City
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

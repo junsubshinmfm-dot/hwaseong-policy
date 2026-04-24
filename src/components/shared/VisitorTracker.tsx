@@ -8,10 +8,9 @@ export function VisitorTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // 관리자 페이지는 집계에서 제외
     if (pathname?.startsWith('/admin')) return;
 
-    const handle = startTracker();
+    const handle = startTracker(pathname || '/');
     return () => {
       handle?.stop();
     };
