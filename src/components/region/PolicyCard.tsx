@@ -21,12 +21,12 @@ interface PolicyCardProps {
 
 const categoryIcons: Record<string, string> = {
   traffic: '🚇', welfare: '🏥', education: '📚', economy: '💰',
-  environment: '🌳', safety: '🛡️', culture: '🎭', admin: '🏛️',
+  environment: '🌳', safety: '🛡️', culture: '🎭', housing: '🏠', admin: '🏛️',
 };
 
 const categoryColors: Record<string, string> = {
   traffic: '#2B6FD4', welfare: '#E88544', education: '#38A169', economy: '#8B5FBF',
-  environment: '#2F9E60', safety: '#2B55B2', culture: '#F58220', admin: '#7B8BA2',
+  environment: '#2F9E60', safety: '#2B55B2', culture: '#F58220', housing: '#D94B7B', admin: '#7B8BA2',
 };
 
 export default function PolicyCard({ policy, onClick }: PolicyCardProps) {

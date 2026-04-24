@@ -59,7 +59,7 @@ const regionKeys: RegionKey[] = ['dongtan', 'byeongjeom', 'manse', 'hyohaeng'];
 
 const categoryIcons: Record<string, string> = {
   traffic: '\u{1F687}', welfare: '\u{1F3E5}', education: '\u{1F4DA}', economy: '\u{1F4B0}',
-  environment: '\u{1F333}', safety: '\u{1F6E1}', culture: '\u{1F3AD}', admin: '\u{1F3DB}',
+  environment: '\u{1F333}', safety: '\u{1F6E1}', culture: '\u{1F3AD}', housing: '\u{1F3E0}', admin: '\u{1F3DB}',
 };
 
 export default function MiniatureMap() {

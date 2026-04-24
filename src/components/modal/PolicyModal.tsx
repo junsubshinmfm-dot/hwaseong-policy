@@ -31,7 +31,7 @@ function extractYouTubeId(url: string): string | null {
 
 const categoryIcons: Record<string, string> = {
   traffic: '🚇', welfare: '🏥', education: '📚', economy: '💰',
-  environment: '🌳', safety: '🛡️', culture: '🎭', admin: '🏛️',
+  environment: '🌳', safety: '🛡️', culture: '🎭', housing: '🏠', admin: '🏛️',
 };
 
 export default function PolicyModal({ policy, onClose }: PolicyModalProps) {

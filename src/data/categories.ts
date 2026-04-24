@@ -6,6 +6,7 @@ export const CATEGORIES = {
   environment: { label: '환경',   color: '#2F9E60', icon: '🌳' },
   safety:      { label: '안전',   color: '#2B55B2', icon: '🛡️' },
   culture:     { label: '문화',   color: '#F58220', icon: '🎭' },
+  housing:     { label: '주거',   color: '#D94B7B', icon: '🏠' },
   admin:       { label: '행정',   color: '#7B8BA2', icon: '🏛️' },
 } as const;
 

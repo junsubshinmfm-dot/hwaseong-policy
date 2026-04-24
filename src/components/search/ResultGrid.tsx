@@ -49,7 +49,7 @@ function ResultCard({ policy, query, onClick }: { policy: Policy; query: string;
 
   const categoryIcons: Record<string, string> = {
     traffic: '🚇', welfare: '🏥', education: '📚', economy: '💰',
-    environment: '🌳', safety: '🛡️', culture: '🎭', admin: '🏛️',
+    environment: '🌳', safety: '🛡️', culture: '🎭', housing: '🏠', admin: '🏛️',
   };
 
   // 검색어 하이라이트

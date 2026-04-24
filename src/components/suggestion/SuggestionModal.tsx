@@ -11,7 +11,7 @@ import type { Suggestion } from '@/types/suggestion';
 
 const categoryIcons: Record<string, string> = {
   traffic: '🚇', welfare: '🏥', education: '📚', economy: '💰',
-  environment: '🌳', safety: '🛡️', culture: '🎭', admin: '🏛️',
+  environment: '🌳', safety: '🛡️', culture: '🎭', housing: '🏠', admin: '🏛️',
 };
 
 interface SuggestionModalProps {
