@@ -16,7 +16,6 @@ import {
   deleteFeedback,
 } from '@/lib/feedbacks';
 import { subscribeVisitorStats, subscribeAllPolicyViews, type VisitorStats } from '@/lib/analytics';
-import policiesData from '@/data/policies.json';
 import type { Suggestion } from '@/types/suggestion';
 import type { Feedback } from '@/types/feedback';
 
@@ -951,25 +950,25 @@ export default function AdminPage() {
               )}
             </div>
 
-            {/* 정책 TOP 10 */}
+            {/* 시민제안 조회수 TOP 10 */}
             <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-navy font-bold text-lg">정책 조회수 TOP 10</h2>
-                <p className="text-navy/30 text-xs">정책 카드 열람 순위</p>
+                <h2 className="text-navy font-bold text-lg">시민제안 조회수 TOP 10</h2>
+                <p className="text-navy/30 text-xs">상세 모달 열람 순위</p>
               </div>
               {Object.keys(policyViews).length === 0 ? (
                 <p className="text-navy/30 text-sm text-center py-8">데이터가 없습니다</p>
               ) : (
                 <div className="space-y-1.5">
                   {(() => {
-                    const policies = policiesData as Array<{ id: number; title: string; category: string }>;
-                    const policyMap = new Map(policies.map((p) => [String(p.id), p]));
+                    const suggestionMap = new Map(suggestions.map((s) => [s.id, s]));
                     const rows = Object.entries(policyViews)
                       .map(([id, count]) => ({
                         id,
                         count: typeof count === 'number' ? count : 0,
-                        title: policyMap.get(id)?.title || `정책 #${id}`,
+                        suggestion: suggestionMap.get(id),
                       }))
+                      .filter((r) => r.suggestion)
                       .sort((a, b) => b.count - a.count)
                       .slice(0, 10);
                     const maxCount = Math.max(...rows.map((r) => r.count), 1);
@@ -979,8 +978,10 @@ export default function AdminPage() {
                           {idx + 1}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-navy text-sm font-bold truncate">{row.title}</p>
-                          <p className="text-navy/35 text-[10px]">정책 #{row.id}</p>
+                          <p className="text-navy text-sm font-bold truncate">{row.suggestion?.title}</p>
+                          <p className="text-navy/35 text-[10px] truncate">
+                            {row.suggestion?.nickname} · 좋아요 {row.suggestion?.likes || 0}
+                          </p>
                         </div>
                         <div className="w-24 sm:w-40 shrink-0 relative h-2 bg-navy-50 rounded-full overflow-hidden">
                           <div

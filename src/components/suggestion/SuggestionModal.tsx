@@ -6,6 +6,7 @@ import CategoryTag from '@/components/shared/CategoryTag';
 import SuggestionLikeButton from './SuggestionLikeButton';
 import ReportButton from './ReportButton';
 import CommentSection from './CommentSection';
+import { usePolicyView } from '@/hooks/usePolicyView';
 import { REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
 import type { Suggestion } from '@/types/suggestion';
 
@@ -21,6 +22,7 @@ interface SuggestionModalProps {
 
 export default function SuggestionModal({ suggestion, onClose }: SuggestionModalProps) {
   const regionMeta = REGIONS[suggestion.region as RegionKey];
+  const viewCount = usePolicyView(suggestion.id);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -115,6 +117,14 @@ export default function SuggestionModal({ suggestion, onClose }: SuggestionModal
               <span className="font-medium">{suggestion.nickname}</span>
               <span>|</span>
               <span>{dateStr}</span>
+              <span>|</span>
+              <span className="flex items-center gap-1">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="tabular-nums">조회 {viewCount.toLocaleString()}</span>
+              </span>
             </div>
 
             <div className="h-px bg-navy-100/30 mb-6" />

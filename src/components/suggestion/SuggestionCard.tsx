@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import CategoryTag from '@/components/shared/CategoryTag';
 import SuggestionLikeButton from './SuggestionLikeButton';
 import ReportButton from './ReportButton';
+import { usePolicyViewCount } from '@/hooks/usePolicyView';
 import { REGIONS, type CategoryKey } from '@/data/categories';
 import type { Suggestion } from '@/types/suggestion';
 
@@ -25,6 +26,7 @@ interface SuggestionCardProps {
 export default function SuggestionCard({ suggestion, onClick }: SuggestionCardProps) {
   const catColor = categoryColors[suggestion.category] || '#1A3B8F';
   const regionMeta = REGIONS[suggestion.region];
+  const viewCount = usePolicyViewCount(suggestion.id);
 
   return (
     <motion.div
@@ -87,6 +89,13 @@ export default function SuggestionCard({ suggestion, onClick }: SuggestionCardPr
             <span className="text-navy/25 text-[10px] truncate">{suggestion.nickname}</span>
           </div>
           <div className="flex items-center gap-1 shrink-0 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-1 text-navy/35 text-[10px] font-semibold px-1.5">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="tabular-nums">{viewCount.toLocaleString()}</span>
+            </div>
             <ReportButton suggestionId={suggestion.id} />
             <SuggestionLikeButton suggestionId={suggestion.id} initialLikes={suggestion.likes} size="sm" />
           </div>
