@@ -15,6 +15,14 @@
       ".read": true,
       ".write": true
     },
+    "presence": {
+      ".read": true,
+      ".write": true
+    },
+    "stats": {
+      ".read": true,
+      ".write": true
+    },
     "$other": {
       ".read": false,
       ".write": false

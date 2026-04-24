@@ -15,6 +15,7 @@ import {
   markFeedbackViewed,
   deleteFeedback,
 } from '@/lib/feedbacks';
+import { subscribeVisitorStats, type VisitorStats } from '@/lib/analytics';
 import type { Suggestion } from '@/types/suggestion';
 import type { Feedback } from '@/types/feedback';
 
@@ -26,9 +27,10 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [tab, setTab] = useState<'suggestions' | 'feedbacks'>('suggestions');
+  const [tab, setTab] = useState<'suggestions' | 'feedbacks' | 'stats'>('suggestions');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
   const [processing, setProcessing] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -55,6 +57,12 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authenticated) return;
     const unsubscribe = subscribeAllFeedbacks((data) => setFeedbacks(data));
+    return () => { unsubscribe?.(); };
+  }, [authenticated]);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    const unsubscribe = subscribeVisitorStats((data) => setVisitorStats(data));
     return () => { unsubscribe?.(); };
   }, [authenticated]);
 
@@ -220,7 +228,11 @@ export default function AdminPage() {
           <div>
             <h1 className="text-2xl font-bold">관리자 대시보드</h1>
             <p className="text-white/50 text-sm mt-1">
-              {tab === 'suggestions' ? '시민 정책제안을 검토, 수정, 등록합니다' : '캠프로 들어온 건의사항을 확인합니다'}
+              {tab === 'suggestions'
+                ? '시민 정책제안을 검토, 수정, 등록합니다'
+                : tab === 'feedbacks'
+                ? '캠프로 들어온 건의사항을 확인합니다'
+                : '사이트 접속자 통계를 확인합니다'}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -265,6 +277,20 @@ export default function AdminPage() {
               {feedbackUnreadCount > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full bg-orange text-white text-[10px] font-bold">
                   NEW {feedbackUnreadCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => { setTab('stats'); setExpandedId(null); }}
+              className={`px-5 py-3 rounded-t-xl text-sm font-bold transition-colors flex items-center gap-1.5 ${
+                tab === 'stats' ? 'bg-[#F4F5F9] text-navy' : 'text-white/60 hover:text-white'
+              }`}
+            >
+              접속자 통계
+              {visitorStats && visitorStats.online > 0 && (
+                <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-500 text-white text-[10px] font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  {visitorStats.online}
                 </span>
               )}
             </button>
@@ -717,6 +743,98 @@ export default function AdminPage() {
                 );
               })}
             </AnimatePresence>
+          </div>
+        )}
+      </div>
+
+      {/* 접속자 통계 탭 */}
+      <div className="max-w-5xl mx-auto px-4 py-6" hidden={tab !== 'stats'}>
+        {!visitorStats ? (
+          <div className="bg-white rounded-2xl border border-navy/[0.06] p-12 text-center">
+            <p className="text-navy/30 text-base">통계를 불러오는 중입니다...</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* 주요 지표 카드 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* 실시간 접속자 */}
+              <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="relative flex w-2.5 h-2.5">
+                    <span className="absolute inline-flex w-full h-full rounded-full bg-green-400 opacity-75 animate-ping" />
+                    <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-green-500" />
+                  </span>
+                  <p className="text-navy/50 text-xs font-bold uppercase tracking-wide">실시간 접속자</p>
+                </div>
+                <p className="text-navy text-4xl font-bold tabular-nums">
+                  {visitorStats.online.toLocaleString()}
+                </p>
+                <p className="text-navy/30 text-xs mt-1">최근 1분 내 활성 사용자</p>
+              </div>
+
+              {/* 오늘 */}
+              <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                <p className="text-navy/50 text-xs font-bold uppercase tracking-wide mb-2">오늘 접속자</p>
+                <p className="text-navy text-4xl font-bold tabular-nums">
+                  {visitorStats.todayUv.toLocaleString()}
+                </p>
+                <p className="text-navy/30 text-xs mt-1">
+                  페이지뷰 {visitorStats.todayPv.toLocaleString()}회
+                </p>
+              </div>
+
+              {/* 누적 */}
+              <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-5">
+                <p className="text-navy/50 text-xs font-bold uppercase tracking-wide mb-2">누적 접속자</p>
+                <p className="text-navy text-4xl font-bold tabular-nums">
+                  {visitorStats.totalUnique.toLocaleString()}
+                </p>
+                <p className="text-navy/30 text-xs mt-1">
+                  누적 페이지뷰 {visitorStats.total.toLocaleString()}회
+                </p>
+              </div>
+            </div>
+
+            {/* 일별 추이 */}
+            <div className="bg-white rounded-2xl border border-navy/[0.06] shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-navy font-bold text-lg">일별 접속자 추이</h2>
+                <p className="text-navy/30 text-xs">최근 30일</p>
+              </div>
+              {visitorStats.daily.length === 0 ? (
+                <p className="text-navy/30 text-sm text-center py-8">데이터가 없습니다</p>
+              ) : (
+                <div className="space-y-2">
+                  {(() => {
+                    const rows = visitorStats.daily.slice(0, 30);
+                    const maxPv = Math.max(...rows.map((r) => r.pv), 1);
+                    return rows.map((row) => {
+                      const [, m, d] = row.date.split('-');
+                      const width = Math.max((row.pv / maxPv) * 100, 2);
+                      return (
+                        <div key={row.date} className="flex items-center gap-3">
+                          <span className="text-navy/40 text-xs font-mono w-12 shrink-0">
+                            {m}.{d}
+                          </span>
+                          <div className="flex-1 relative h-6 bg-navy-50 rounded-lg overflow-hidden">
+                            <div
+                              className="absolute inset-y-0 left-0 bg-gradient-to-r from-navy/70 to-navy rounded-lg transition-all"
+                              style={{ width: `${width}%` }}
+                            />
+                          </div>
+                          <span className="text-navy text-xs font-bold tabular-nums w-16 text-right shrink-0">
+                            {row.uv.toLocaleString()}명
+                          </span>
+                          <span className="text-navy/40 text-xs tabular-nums w-20 text-right shrink-0">
+                            PV {row.pv.toLocaleString()}
+                          </span>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

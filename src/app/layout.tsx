@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { VisitorTracker } from "@/components/shared/VisitorTracker";
+import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
 
 const pretendard = localFont({
   src: [
@@ -49,6 +51,8 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${pretendard.variable} ${geistMono.variable}`}>
       <body className="font-sans antialiased safe-top safe-bottom">
+        <VisitorTracker />
+        <GoogleAnalytics />
         {children}
       </body>
     </html>
