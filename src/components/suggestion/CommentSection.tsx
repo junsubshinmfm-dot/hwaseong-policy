@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { subscribeComments, submitComment, deleteComment } from '@/lib/comments';
+import {
+  subscribeComments,
+  submitComment,
+  deleteComment,
+  verifyCommentPassword,
+} from '@/lib/comments';
 import { moderateContent } from '@/lib/moderation';
 import type { Comment } from '@/types/suggestion';
 
@@ -63,7 +68,8 @@ export default function CommentSection({ suggestionId }: CommentSectionProps) {
   };
 
   const handleDelete = async (comment: Comment) => {
-    if (deletePassword !== comment.password) {
+    const ok = await verifyCommentPassword(comment, deletePassword);
+    if (!ok) {
       alert('비밀번호가 일치하지 않습니다');
       return;
     }

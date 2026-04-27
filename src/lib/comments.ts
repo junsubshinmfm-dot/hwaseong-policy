@@ -4,6 +4,35 @@ import type { Comment } from '@/types/suggestion';
 
 const COMMENTS_PATH = 'comments';
 
+function bytesToHex(bytes: Uint8Array): string {
+  let hex = '';
+  for (let i = 0; i < bytes.length; i++) {
+    hex += bytes[i].toString(16).padStart(2, '0');
+  }
+  return hex;
+}
+
+function generateSalt(): string {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return bytesToHex(arr);
+}
+
+async function hashPassword(password: string, salt: string): Promise<string> {
+  const data = new TextEncoder().encode(`${salt}:${password}`);
+  const buffer = await crypto.subtle.digest('SHA-256', data);
+  return bytesToHex(new Uint8Array(buffer));
+}
+
+export async function verifyCommentPassword(
+  comment: Comment,
+  plaintext: string,
+): Promise<boolean> {
+  if (!comment.passwordHash || !comment.passwordSalt) return false;
+  const candidate = await hashPassword(plaintext, comment.passwordSalt);
+  return candidate === comment.passwordHash;
+}
+
 export async function submitComment(
   suggestionId: string,
   data: { nickname: string; content: string; password: string }
@@ -13,11 +42,15 @@ export async function submitComment(
   const commentsRef = ref(db, `${COMMENTS_PATH}/${suggestionId}`);
   const newRef = push(commentsRef);
 
+  const passwordSalt = generateSalt();
+  const passwordHash = await hashPassword(data.password, passwordSalt);
+
   const comment: Omit<Comment, 'id'> = {
     suggestionId,
     nickname: data.nickname,
     content: data.content,
-    password: data.password,
+    passwordHash,
+    passwordSalt,
     createdAt: Date.now(),
   };
 

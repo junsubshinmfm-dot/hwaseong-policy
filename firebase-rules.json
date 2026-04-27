@@ -15,6 +15,22 @@
       ".read": true,
       ".write": true
     },
+    "comments": {
+      "$suggestionId": {
+        ".read": true,
+        ".write": true,
+        "$commentId": {
+          ".validate": "newData.hasChildren(['nickname','content','passwordHash','passwordSalt','suggestionId','createdAt'])",
+          "nickname": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 15" },
+          "content": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 500" },
+          "passwordHash": { ".validate": "newData.isString() && newData.val().length === 64" },
+          "passwordSalt": { ".validate": "newData.isString() && newData.val().length === 32" },
+          "suggestionId": { ".validate": "newData.isString() && newData.val() === $suggestionId" },
+          "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now" },
+          "$other": { ".validate": false }
+        }
+      }
+    },
     "presence": {
       ".read": true,
       ".write": true

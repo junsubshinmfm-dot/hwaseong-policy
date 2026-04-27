@@ -37,5 +37,6 @@ export interface Comment {
   nickname: string;
   content: string;
   createdAt: number;
-  password: string;     // 본인만 삭제 가능
+  passwordHash: string; // SHA-256(salt + password)
+  passwordSalt: string; // 댓글별 random salt (hex)
 }
