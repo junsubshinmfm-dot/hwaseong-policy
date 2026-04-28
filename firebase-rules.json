@@ -26,7 +26,7 @@
           "passwordHash": { ".validate": "newData.isString() && newData.val().length === 64" },
           "passwordSalt": { ".validate": "newData.isString() && newData.val().length === 32" },
           "suggestionId": { ".validate": "newData.isString() && newData.val() === $suggestionId" },
-          "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now" },
+          "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now + 300000" },
           "$other": { ".validate": false }
         }
       }
