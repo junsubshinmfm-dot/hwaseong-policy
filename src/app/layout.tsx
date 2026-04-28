@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { VisitorTracker } from "@/components/shared/VisitorTracker";
 import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
+import { TimelineProvider } from "@/hooks/useTimeline";
 
 const pretendard = localFont({
   src: [
@@ -53,7 +54,7 @@ export default function RootLayout({
       <body className="font-sans antialiased safe-top safe-bottom">
         <VisitorTracker />
         <GoogleAnalytics />
-        {children}
+        <TimelineProvider>{children}</TimelineProvider>
       </body>
     </html>
   );

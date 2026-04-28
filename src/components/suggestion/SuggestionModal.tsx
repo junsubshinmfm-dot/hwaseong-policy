@@ -23,6 +23,7 @@ interface SuggestionModalProps {
 export default function SuggestionModal({ suggestion, onClose }: SuggestionModalProps) {
   const regionMeta = REGIONS[suggestion.region as RegionKey];
   const viewCount = usePolicyView(suggestion.id);
+  const isPledge = suggestion.id.startsWith('pledge-');
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -94,7 +95,7 @@ export default function SuggestionModal({ suggestion, onClose }: SuggestionModal
 
             <div className="absolute top-4 left-4 flex items-center gap-2">
               <span className="px-3 py-1 rounded-lg bg-orange text-white text-sm font-bold shadow-sm">
-                시민제안
+                {isPledge ? '공약' : '시민제안'}
               </span>
               <CategoryTag category={suggestion.category as CategoryKey} size="md" />
               {regionMeta && (

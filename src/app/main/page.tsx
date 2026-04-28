@@ -10,12 +10,22 @@ import CategoryChart from '@/components/main/CategoryChart';
 import PolicyRanking from '@/components/main/PolicyRanking';
 import MyAreaPolicies from '@/components/main/MyAreaPolicies';
 import WelcomePopup from '@/components/shared/WelcomePopup';
+import TimelineSlider from '@/components/timeline/TimelineSlider';
+import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
+import { useTimeline } from '@/hooks/useTimeline';
+import { backgroundForSlider } from '@/lib/timeline';
 
 export default function MainPage() {
+  const { sliderValue } = useTimeline();
+  const pageBg = backgroundForSlider(sliderValue);
   return (
-    <main className="min-h-screen bg-[var(--background)] relative overflow-hidden">
+    <main
+      className="min-h-screen relative overflow-hidden transition-colors"
+      style={{ background: pageBg, transitionDuration: '120ms' }}
+    >
       <WelcomePopup />
       <Navbar />
+      <TimelineSlider />
 
       <div className="absolute top-16 left-0 right-0 h-[180px] z-0 hidden md:block">
         <GeoPattern variant="header" className="w-full h-full" />
@@ -23,7 +33,7 @@ export default function MainPage() {
       <GeoPattern variant="corner-tl" className="w-[250px] h-[250px] z-0 opacity-80 hidden lg:block" />
       <GeoPattern variant="corner-br" className="w-[300px] h-[300px] z-0 opacity-80 hidden lg:block" />
 
-      <div className="relative z-10 pt-16 md:pt-20">
+      <div className="relative z-10 pt-[190px] md:pt-[230px]">
 
         {/* 모바일 전용: 프로필 배너 */}
         <div className="lg:hidden">
@@ -53,7 +63,7 @@ export default function MainPage() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-            className="hidden lg:block w-[340px] xl:w-[380px] shrink-0 p-6 pt-0 pr-8"
+            className="hidden lg:block w-[340px] xl:w-[380px] shrink-0 p-6 pt-6 pr-8"
           >
             <SidePanel />
           </motion.div>
@@ -66,7 +76,10 @@ export default function MainPage() {
         transition={{ delay: 1 }}
         className="relative z-10 text-center text-navy/30 text-sm font-medium py-4"
       >
-        미니어처를 클릭하면 해당 권역의 공약을 볼 수 있습니다
+        <TimelineCrossfade
+          past={<span>미니어처를 클릭하면 해당 권역의 시민제안을 볼 수 있습니다</span>}
+          future={<span>미니어처를 클릭하면 해당 권역의 공약을 볼 수 있습니다</span>}
+        />
       </motion.p>
 
       <div className="relative z-10">

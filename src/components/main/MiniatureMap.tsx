@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { REGIONS, CATEGORIES, type RegionKey, type CategoryKey } from '@/data/categories';
@@ -8,12 +8,20 @@ import regionsData from '@/data/regions.json';
 import { useTimeOfDay, TIME_STYLES } from '@/hooks/useTimeOfDay';
 import { useSuggestionsByRegion } from '@/hooks/useSuggestions';
 import { useWeather } from '@/hooks/useWeather';
+import { useTimeline } from '@/hooks/useTimeline';
+import { futureClipRatio } from '@/lib/timeline';
+import { pledgesByRegion, PLEDGE_COUNT_BY_REGION } from '@/data/pledges';
+import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
+import PledgeRevealNotice from '@/components/timeline/PledgeRevealNotice';
 import WeatherEffects from './WeatherEffects';
 import SkyBody from './SkyBody';
 import MayorCharacter from './MayorCharacter';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const CITY_IMAGE: string | null = `${BASE}/images/miniature-city.png`;
+const CITY_IMAGE_FUTURE: string | null = `${BASE}/images/miniature-city-2030.png`;
+// 임시 미래 톤은 자산이 없을 때만 사용 (CITY_IMAGE_FUTURE가 있으면 무시됨)
+const FUTURE_PREVIEW_FILTER = '';
 
 /**
  * 권역별 SVG 다각형 좌표 (% 기준)
@@ -68,6 +76,17 @@ export default function MiniatureMap() {
   const weather = useWeather();
   const timeStyle = TIME_STYLES[time.period];
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { sliderValue, revealed, futureMode } = useTimeline();
+  const futureRatio = futureClipRatio(sliderValue);
+  // 미래 레이어가 좌→우로 채워짐. 우측은 (1 - ratio)% 만큼 잘라냄.
+  const futureClipRight = (1 - futureRatio) * 100;
+  const futureSrc = CITY_IMAGE_FUTURE ?? CITY_IMAGE;
+  const baseFutureFilter = CITY_IMAGE_FUTURE
+    ? timeStyle.filter
+    : `${timeStyle.filter ?? ''} ${FUTURE_PREVIEW_FILTER}`.trim();
+  // 5/21 이전엔 미래 레이어를 흐리게 (티저 모드)
+  const futureFilter = revealed ? baseFutureFilter : `${baseFutureFilter} blur(8px)`;
+  const showClipLine = sliderValue > 1 && sliderValue < 99;
 
   const [hovered, setHovered] = useState<RegionKey | null>(null);
   const [selected, setSelected] = useState<RegionKey | null>(null);
@@ -77,6 +96,12 @@ export default function MiniatureMap() {
   }, []);
 
   const { suggestions: selectedSuggestions } = useSuggestionsByRegion(selected || 'dongtan');
+  // 슬라이더 우측(2030)일 땐 더미 공약 카드, 좌측(2026)일 땐 시민제안 카드
+  const selectedPledges = useMemo(
+    () => (selected ? pledgesByRegion(selected) : []),
+    [selected],
+  );
+  const cardsToShow = futureMode ? selectedPledges : selectedSuggestions;
   const selectedRegion = selected ? REGIONS[selected] : null;
   const hoveredRegion = hovered ? REGIONS[hovered] : null;
   const hoveredInfo = hovered ? regionsData.find((r) => r.id === hovered) : null;
@@ -174,10 +199,36 @@ export default function MiniatureMap() {
 
         <div className="relative w-full aspect-square">
           {CITY_IMAGE ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={CITY_IMAGE} alt="화성특례시 미니어처"
-              className="absolute inset-0 w-full h-full object-cover transition-all duration-[3000ms]"
-              style={{ filter: timeStyle.filter }} />
+            <>
+              {/* 2026 베이스 레이어 */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={CITY_IMAGE} alt="화성특례시 미니어처 (현재)"
+                className="absolute inset-0 w-full h-full object-cover transition-all duration-[3000ms]"
+                style={{ filter: timeStyle.filter }} />
+
+              {/* 2030 미래 레이어 — 슬라이더가 우측으로 간 만큼 좌→우로 드러남 */}
+              {futureSrc && futureRatio > 0 && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={futureSrc}
+                  alt="화성특례시 미니어처 (2030)"
+                  aria-hidden={futureRatio < 0.5}
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                  style={{
+                    filter: futureFilter,
+                    clipPath: `inset(0 ${futureClipRight}% 0 0)`,
+                  }}
+                />
+              )}
+
+              {/* 클립 가이드 라인 (슬라이더 위치) */}
+              {showClipLine && (
+                <div
+                  className="absolute top-0 bottom-0 w-[2px] bg-white/70 shadow-[0_0_8px_rgba(255,255,255,0.6)] pointer-events-none z-[7]"
+                  style={{ left: `${sliderValue}%` }}
+                />
+              )}
+            </>
           ) : (
             <PlaceholderCity time={time.period} />
           )}
@@ -244,7 +295,10 @@ export default function MiniatureMap() {
                       color: time.period === 'night' ? 'rgba(255,255,255,0.7)' : 'rgba(26,59,143,0.7)',
                       textShadow: time.period === 'night' ? '0 1px 4px rgba(0,0,0,0.8)' : '0 1px 4px rgba(255,255,255,0.8)',
                     }}>
-                    제안 보기
+                    <TimelineCrossfade
+                      past={<span>제안 보기</span>}
+                      future={<span>공약 보기</span>}
+                    />
                   </div>
                 </motion.div>
               </div>
@@ -272,7 +326,12 @@ export default function MiniatureMap() {
                   <div className="flex items-center gap-1.5 sm:gap-2.5">
                     <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shadow-lg" style={{ backgroundColor: selectedRegion.color }} />
                     <span className="text-white font-extrabold text-sm sm:text-lg drop-shadow">{selectedRegion.label}</span>
-                    <span className="text-white/50 text-xs sm:text-sm font-bold">{selectedSuggestions.length}개 제안</span>
+                    <span className="text-white/50 text-xs sm:text-sm font-bold">
+                      <TimelineCrossfade
+                        past={<span>{selectedSuggestions.length}개 제안</span>}
+                        future={<span>{PLEDGE_COUNT_BY_REGION[selected] ?? 0}개 공약</span>}
+                      />
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <button
@@ -293,35 +352,47 @@ export default function MiniatureMap() {
 
                 {/* 카드 캐러셀 — 드래그 + 5개 보임 (양끝 잘림) */}
                 <div className="relative z-10 flex-1 flex items-center overflow-hidden">
+                  {futureMode && !revealed ? (
+                    <div className="w-full px-6 sm:px-12 flex items-center justify-center"
+                         onClick={(e) => e.stopPropagation()}>
+                      <PledgeRevealNotice variant="modal" regionLabel={selectedRegion?.label} />
+                    </div>
+                  ) : (
                   <div ref={scrollRef}
                     onClick={(e) => e.stopPropagation()}
                     className="flex gap-2 sm:gap-3 overflow-x-auto py-1 sm:py-2 scrollbar-hide items-center w-full cursor-grab select-none"
-                    style={{ height: 'clamp(180px, 45%, 500px)', paddingLeft: '8%', paddingRight: '8%' }}
+                    style={{
+                      height: 'clamp(180px, 45%, 500px)',
+                      paddingLeft: '8%',
+                      paddingRight: '8%',
+                    }}
                   >
-                    {/* 제안하기 카드 (항상 첫 번째) */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35 }}
-                      className="shrink-0"
-                      style={{ width: 'calc(24% - 10px)', minWidth: '140px' }}
-                    >
-                      <div
-                        className="h-full bg-gradient-to-br from-orange to-orange-dark rounded-2xl overflow-hidden shadow-2xl
-                                   hover:scale-[1.03] hover:-translate-y-2 transition-all duration-300
-                                   border border-white/30 flex flex-col items-center justify-center cursor-pointer p-4"
-                        onClick={() => router.push('/suggestions/new')}
+                    {/* 제안하기 카드 — 시민제안 모드(2026)에서만 노출 */}
+                    {!futureMode && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35 }}
+                        className="shrink-0"
+                        style={{ width: 'calc(24% - 10px)', minWidth: '140px' }}
                       >
-                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-3">
-                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                          </svg>
+                        <div
+                          className="h-full bg-gradient-to-br from-orange to-orange-dark rounded-2xl overflow-hidden shadow-2xl
+                                     hover:scale-[1.03] hover:-translate-y-2 transition-all duration-300
+                                     border border-white/30 flex flex-col items-center justify-center cursor-pointer p-4"
+                          onClick={() => router.push('/suggestions/new')}
+                        >
+                          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-3">
+                            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                          </div>
+                          <p className="text-white font-bold text-sm text-center">정책 제안하기</p>
+                          <p className="text-white/60 text-[10px] text-center mt-1">이 지역에 필요한 정책을 제안해주세요</p>
                         </div>
-                        <p className="text-white font-bold text-sm text-center">정책 제안하기</p>
-                        <p className="text-white/60 text-[10px] text-center mt-1">이 지역에 필요한 정책을 제안해주세요</p>
-                      </div>
-                    </motion.div>
-                    {selectedSuggestions.map((suggestion, i) => {
+                      </motion.div>
+                    )}
+                    {cardsToShow.map((suggestion, i) => {
                       const catColor = CATEGORIES[suggestion.category as CategoryKey]?.color || '#1A3B8F';
 
                       return (
@@ -357,7 +428,10 @@ export default function MiniatureMap() {
                                 {categoryIcons[suggestion.category] || '\u{1F4CB}'}
                               </div>
                               <div className="absolute top-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-bold text-white bg-orange shadow-lg">
-                                시민제안
+                                <TimelineCrossfade
+                                  past={<span>시민제안</span>}
+                                  future={<span>공약</span>}
+                                />
                               </div>
                               <div className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-xs font-bold"
                                 style={{ backgroundColor: `${catColor}18`, color: catColor }}>
@@ -379,10 +453,15 @@ export default function MiniatureMap() {
                       );
                     })}
                   </div>
+                  )}
 
-                  {/* 좌우 잘림 페이드 */}
-                  <div className="absolute top-0 left-0 bottom-0 w-[8%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none z-[1]" />
-                  <div className="absolute top-0 right-0 bottom-0 w-[8%] bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-[1]" />
+                  {/* 좌우 잘림 페이드 — 5/21 전 안내 박스 모드에선 숨김 */}
+                  {!(futureMode && !revealed) && (
+                    <>
+                      <div className="absolute top-0 left-0 bottom-0 w-[8%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none z-[1]" />
+                      <div className="absolute top-0 right-0 bottom-0 w-[8%] bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-[1]" />
+                    </>
+                  )}
                 </div>
 
                 {/* 하단 닫기 안내 */}

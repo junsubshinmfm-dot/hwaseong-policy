@@ -8,6 +8,24 @@ interface SearchBarProps {
   onChange: (value: string) => void;
 }
 
+function HighlightedSuggestion({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <span>{text}</span>;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+  const lower = query.toLowerCase();
+  return (
+    <span>
+      {parts.map((part, i) =>
+        part.toLowerCase() === lower ? (
+          <span key={i} className="text-orange font-bold">{part}</span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </span>
+  );
+}
+
 export default function SearchBar({ value, onChange }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -91,12 +109,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
                 <svg className="w-4 h-4 text-orange/50 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <span dangerouslySetInnerHTML={{
-                  __html: s.replace(
-                    new RegExp(`(${localValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
-                    '<span class="text-orange font-bold">$1</span>'
-                  )
-                }} />
+                <HighlightedSuggestion text={s} query={localValue} />
               </button>
             ))}
           </motion.div>
