@@ -8,14 +8,22 @@ export default function TimelineSlider() {
   const { sliderValue, setSliderValue, year, futureMode, revealed, daysUntilReveal } = useTimeline();
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+  const pendingClientXRef = useRef<number | null>(null);
 
   const updateFromClientX = useCallback(
     (clientX: number) => {
-      const track = trackRef.current;
-      if (!track) return;
-      const rect = track.getBoundingClientRect();
-      const ratio = (clientX - rect.left) / rect.width;
-      setSliderValue(ratio * TIMELINE_MAX);
+      pendingClientXRef.current = clientX;
+      if (rafRef.current != null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        const x = pendingClientXRef.current;
+        const track = trackRef.current;
+        if (x == null || !track) return;
+        const rect = track.getBoundingClientRect();
+        const ratio = (x - rect.left) / rect.width;
+        setSliderValue(ratio * TIMELINE_MAX);
+      });
     },
     [setSliderValue],
   );
@@ -36,6 +44,7 @@ export default function TimelineSlider() {
       window.removeEventListener('pointermove', handleMove);
       window.removeEventListener('pointerup', handleUp);
       window.removeEventListener('pointercancel', handleUp);
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
   }, [updateFromClientX]);
 

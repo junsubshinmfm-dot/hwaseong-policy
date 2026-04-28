@@ -33,7 +33,7 @@ export default function MainPage() {
       <GeoPattern variant="corner-tl" className="w-[250px] h-[250px] z-0 opacity-80 hidden lg:block" />
       <GeoPattern variant="corner-br" className="w-[300px] h-[300px] z-0 opacity-80 hidden lg:block" />
 
-      <div className="relative z-10 pt-[190px] md:pt-[230px]">
+      <div className="relative z-10 pt-[240px] md:pt-[250px]">
 
         {/* 모바일 전용: 프로필 배너 */}
         <div className="lg:hidden">
