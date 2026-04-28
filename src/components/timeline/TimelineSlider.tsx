@@ -53,6 +53,78 @@ export default function TimelineSlider() {
     updateFromClientX(e.clientX);
   };
 
+  // 첫 방문 시 슬라이더가 0 → 30 → 0으로 자동 시연 (세션당 1회)
+  useEffect(() => {
+    const DEMO_KEY = 'timeline-demo-seen';
+    if (sessionStorage.getItem(DEMO_KEY)) return;
+    if (sliderValue !== 0) {
+      sessionStorage.setItem(DEMO_KEY, 'true');
+      return;
+    }
+
+    const cleanupFns: Array<() => void> = [];
+
+    const runDemo = () => {
+      const startDelayId = window.setTimeout(() => {
+        sessionStorage.setItem(DEMO_KEY, 'true');
+        const phases: Array<{ from: number; to: number; duration: number; ease: (t: number) => number }> = [
+          { from: 0, to: 32, duration: 720, ease: (t) => 1 - Math.pow(1 - t, 3) }, // ease-out
+          { from: 32, to: 32, duration: 380, ease: (t) => t },
+          { from: 32, to: 0, duration: 600, ease: (t) => t * t * t }, // ease-in
+        ];
+        let phaseIdx = 0;
+        let phaseStart = performance.now();
+        let demoRaf: number | null = null;
+        const tick = (now: number) => {
+          // 사용자가 도중에 잡으면 시연 중단
+          if (draggingRef.current) {
+            setSliderValue(0);
+            return;
+          }
+          const phase = phases[phaseIdx];
+          const elapsed = now - phaseStart;
+          const t = Math.min(elapsed / phase.duration, 1);
+          const eased = phase.ease(t);
+          const value = phase.from + (phase.to - phase.from) * eased;
+          setSliderValue(value);
+          if (t < 1) {
+            demoRaf = requestAnimationFrame(tick);
+          } else {
+            phaseIdx += 1;
+            if (phaseIdx < phases.length) {
+              phaseStart = now;
+              demoRaf = requestAnimationFrame(tick);
+            } else {
+              setSliderValue(0);
+            }
+          }
+        };
+        demoRaf = requestAnimationFrame(tick);
+        cleanupFns.push(() => {
+          if (demoRaf != null) cancelAnimationFrame(demoRaf);
+        });
+      }, 800);
+      cleanupFns.push(() => clearTimeout(startDelayId));
+    };
+
+    if (sessionStorage.getItem('welcome_popup_seen')) {
+      runDemo();
+    } else {
+      const onClose = () => {
+        window.removeEventListener('welcome_popup_closed', onClose);
+        runDemo();
+      };
+      window.addEventListener('welcome_popup_closed', onClose);
+      cleanupFns.push(() => window.removeEventListener('welcome_popup_closed', onClose));
+    }
+
+    return () => {
+      cleanupFns.forEach((fn) => fn());
+    };
+    // 의도적으로 mount 시 1회만 실행
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const step = e.shiftKey ? 10 : 5;
     if (e.key === 'ArrowLeft') {

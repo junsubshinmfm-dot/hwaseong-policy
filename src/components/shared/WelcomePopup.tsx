@@ -25,6 +25,7 @@ export default function WelcomePopup() {
   const handleClose = () => {
     setIsOpen(false);
     sessionStorage.setItem(STORAGE_KEY, 'true');
+    window.dispatchEvent(new Event('welcome_popup_closed'));
   };
 
   const handlePropose = () => {
@@ -119,6 +120,14 @@ export default function WelcomePopup() {
                         함께 만들어가는 화성의 미래를 꿈꿔보세요.
                       </p>
                     </div>
+                  </div>
+
+                  <div className="rounded-xl bg-gradient-to-r from-navy/[0.06] via-orange/[0.05] to-orange/[0.08] border border-orange/20 px-3 py-2.5 flex items-start gap-2.5">
+                    <span className="text-base shrink-0 mt-0.5">⏰</span>
+                    <p className="text-navy text-xs font-bold leading-relaxed">
+                      상단 시계를 오른쪽 끝까지 끌면<br />
+                      <span className="text-orange">정명근 공약 사이트</span>로 바뀝니다
+                    </p>
                   </div>
                 </div>
 
