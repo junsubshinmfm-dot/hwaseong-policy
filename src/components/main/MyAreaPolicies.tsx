@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { REGIONS, CATEGORIES, type RegionKey, type CategoryKey } from '@/data/categories';
 import { useSuggestions } from '@/hooks/useSuggestions';
+import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
 
 const REGION_POINTS: Record<RegionKey, { lat: number; lng: number }[]> = {
   manse: [
@@ -122,11 +123,17 @@ export default function MyAreaPolicies() {
       <div className="brand-card p-4">
         <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
           {locationIcon}
-          우리동네 정책제안
+          <TimelineCrossfade
+            past={<span>우리동네 정책제안</span>}
+            future={<span>우리동네 공약</span>}
+          />
         </h3>
         <button onClick={requestLocation}
           className="w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-navy to-navy-light hover:shadow-lg hover:scale-[1.02] transition-all">
-          내 위치로 우리동네 제안 찾기
+          <TimelineCrossfade
+            past={<span>내 위치로 우리동네 제안 찾기</span>}
+            future={<span>내 위치로 우리동네 공약 찾기</span>}
+          />
         </button>
         <p className="text-navy/25 text-[10px] text-center mt-2">위치 정보를 사용하여 가장 가까운 권역을 찾습니다</p>
       </div>
@@ -138,7 +145,10 @@ export default function MyAreaPolicies() {
       <div className="brand-card p-4">
         <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
           {locationIcon}
-          우리동네 정책제안
+          <TimelineCrossfade
+            past={<span>우리동네 정책제안</span>}
+            future={<span>우리동네 공약</span>}
+          />
         </h3>
         <div className="flex items-center justify-center py-4 gap-2">
           <div className="w-4 h-4 border-2 border-navy/20 border-t-navy rounded-full animate-spin" />
@@ -153,7 +163,10 @@ export default function MyAreaPolicies() {
       <div className="brand-card p-4">
         <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
           {locationIcon}
-          우리동네 정책제안
+          <TimelineCrossfade
+            past={<span>우리동네 정책제안</span>}
+            future={<span>우리동네 공약</span>}
+          />
         </h3>
         <p className="text-navy/40 text-xs text-center py-2">
           {status === 'denied' ? '위치 권한이 거부되었습니다' : '위치를 확인할 수 없습니다'}
@@ -191,12 +204,20 @@ export default function MyAreaPolicies() {
 
       {regionSuggestions.length === 0 ? (
         <div className="text-center py-3">
-          <p className="text-navy/30 text-xs mb-2">아직 이 지역의 제안이 없습니다</p>
+          <p className="text-navy/30 text-xs mb-2">
+            <TimelineCrossfade
+              past={<span>아직 이 지역의 제안이 없습니다</span>}
+              future={<span>이 지역에 곧 공약이 추가됩니다</span>}
+            />
+          </p>
           <button
             onClick={() => router.push('/suggestions/new')}
             className="text-orange text-xs font-bold hover:underline"
           >
-            첫 번째 정책을 제안해보세요!
+            <TimelineCrossfade
+              past={<span>첫 번째 정책을 제안해보세요!</span>}
+              future={<span>전체 공약 둘러보기</span>}
+            />
           </button>
         </div>
       ) : (
@@ -234,7 +255,10 @@ export default function MyAreaPolicies() {
           className="w-full mt-3 py-2 rounded-xl text-xs font-bold transition-all hover:scale-[1.02]"
           style={{ backgroundColor: `${regionMeta?.color}15`, color: regionMeta?.color }}
         >
-          {regionMeta?.label} 전체 제안 보기
+          <TimelineCrossfade
+            past={<span>{regionMeta?.label} 전체 제안 보기</span>}
+            future={<span>{regionMeta?.label} 전체 공약 보기</span>}
+          />
         </button>
       )}
     </div>

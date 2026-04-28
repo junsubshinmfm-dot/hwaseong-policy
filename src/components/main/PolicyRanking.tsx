@@ -4,22 +4,31 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CATEGORIES, REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
 import { useSuggestions } from '@/hooks/useSuggestions';
+import { useTimeline } from '@/hooks/useTimeline';
+import { PLEDGES_FALLBACK } from '@/data/pledges';
+import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
 
 export default function PolicyRanking() {
   const router = useRouter();
-  const { suggestions, loading } = useSuggestions();
+  const { suggestions: citizenSuggestions, loading } = useSuggestions();
+  const { futureMode, revealed } = useTimeline();
+  const futureBlur = futureMode && !revealed;
 
-  const ranked = [...suggestions]
-    .sort((a, b) => b.likes - a.likes)
-    .slice(0, 5);
+  // 슬라이더 우측이면 공약 더미를 그대로 5개. 좌측이면 좋아요 순 시민제안.
+  const ranked = futureMode
+    ? PLEDGES_FALLBACK.slice(0, 5)
+    : [...citizenSuggestions].sort((a, b) => b.likes - a.likes).slice(0, 5);
 
-  const hasAnyLikes = ranked.some((r) => r.likes > 0);
+  const hasAnyLikes = futureMode ? true : ranked.some((r) => r.likes > 0);
 
   return (
     <div className="brand-card p-4">
       <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
         <span className="text-orange text-base">&#9829;</span>
-        인기 정책제안 TOP 5
+        <TimelineCrossfade
+          past={<span>인기 정책제안 TOP 5</span>}
+          future={<span>인기 공약 TOP 5</span>}
+        />
       </h3>
 
       {loading ? (
@@ -39,7 +48,10 @@ export default function PolicyRanking() {
           </button>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div
+          className="space-y-2 transition-[filter] duration-300"
+          style={{ filter: futureBlur ? 'blur(7px)' : 'none' }}
+        >
           {ranked.map((suggestion, i) => {
             const catColor = CATEGORIES[suggestion.category as CategoryKey]?.color || '#1A3B8F';
             const regionMeta = REGIONS[suggestion.region as RegionKey];

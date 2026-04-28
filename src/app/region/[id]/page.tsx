@@ -6,12 +6,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { REGIONS, type RegionKey, type CategoryKey } from '@/data/categories';
 import { useRegionData } from '@/hooks/useRegionData';
 import { useSuggestionsByRegion } from '@/hooks/useSuggestions';
+import { useTimeline } from '@/hooks/useTimeline';
+import { pledgesByRegion, PLEDGE_COUNT_BY_REGION } from '@/data/pledges';
 import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
 import LikedSuggestionsCarousel from '@/components/region/LikedSuggestionsCarousel';
 import FilterTabs from '@/components/region/FilterTabs';
 import SuggestionGrid from '@/components/suggestion/SuggestionGrid';
 import SuggestionModal from '@/components/suggestion/SuggestionModal';
+import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
+import PledgeRevealNotice from '@/components/timeline/PledgeRevealNotice';
+import TimelineSlider from '@/components/timeline/TimelineSlider';
 import type { Suggestion } from '@/types/suggestion';
 
 export default function RegionPage() {
@@ -34,7 +39,15 @@ function RegionContent() {
   const regionMeta = REGIONS[regionId];
 
   const { region } = useRegionData(regionId);
-  const { suggestions, loading: suggestionsLoading } = useSuggestionsByRegion(regionId);
+  const { suggestions: citizenSuggestions, loading: suggestionsLoading } = useSuggestionsByRegion(regionId);
+  const { futureMode, revealed } = useTimeline();
+  const pledges = useMemo(() => pledgesByRegion(regionId), [regionId]);
+
+  // 슬라이더 우측이면 공약 더미, 좌측이면 시민제안
+  const suggestions = futureMode ? pledges : citizenSuggestions;
+  // 5/21 전 공약 모드면 카드 그리드를 안내 박스로 대체
+  const showRevealNotice = futureMode && !revealed;
+
   const [activeFilter, setActiveFilter] = useState<CategoryKey | null>(null);
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null);
 
@@ -73,9 +86,10 @@ function RegionContent() {
   return (
     <main className="min-h-screen bg-[#F4F5F9] relative overflow-hidden">
       <Navbar />
+      <TimelineSlider />
 
       {/* ── 상단 프리미엄 히어로 ── */}
-      <div className="relative pt-16">
+      <div className="relative pt-[220px] md:pt-[260px]">
         {/* 배경 */}
         <div className="absolute inset-0 overflow-hidden">
           <div
@@ -123,7 +137,10 @@ function RegionContent() {
                 <h1 className="text-white text-3xl md:text-4xl font-black mb-1 drop-shadow-sm">{regionMeta.label}</h1>
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 backdrop-blur-sm text-white/80 text-sm font-semibold">
-                    {suggestions.length}개 시민제안
+                    <TimelineCrossfade
+                      past={<span>{citizenSuggestions.length}개 시민제안</span>}
+                      future={<span>{PLEDGE_COUNT_BY_REGION[regionId] ?? pledges.length}개 공약</span>}
+                    />
                   </span>
                 </div>
               </div>
@@ -143,15 +160,22 @@ function RegionContent() {
         >
           <h2 className="text-navy/40 text-sm font-bold uppercase tracking-wider mb-4 ml-1 flex items-center gap-2">
             <span className="w-4 h-0.5 rounded-full bg-orange" />
-            인기 정책제안
+            <TimelineCrossfade
+              past={<span>인기 정책제안</span>}
+              future={<span>인기 공약</span>}
+            />
           </h2>
-          <LikedSuggestionsCarousel
-            suggestions={suggestions}
-            onCardClick={setSelectedSuggestion}
-          />
+          {showRevealNotice ? (
+            <PledgeRevealNotice variant="page" regionLabel={regionMeta.label} />
+          ) : (
+            <LikedSuggestionsCarousel
+              suggestions={suggestions}
+              onCardClick={setSelectedSuggestion}
+            />
+          )}
         </motion.section>
 
-        {/* 시민 정책제안 */}
+        {/* 시민 정책제안 / 공약 리스트 */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,23 +185,30 @@ function RegionContent() {
             <div className="flex items-center justify-between">
               <h2 className="text-navy/40 text-sm font-bold uppercase tracking-wider ml-1 flex items-center gap-2">
                 <span className="w-4 h-0.5 rounded-full bg-orange" />
-                시민 정책제안
+                <TimelineCrossfade
+                  past={<span>시민 정책제안</span>}
+                  future={<span>정명근의 공약</span>}
+                />
               </h2>
-              <button
-                onClick={() => router.push('/suggestions/new')}
-                className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-orange text-white text-xs sm:text-sm font-bold
-                           hover:bg-orange-dark hover:shadow-lg transition-all flex items-center gap-1"
-              >
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                제안하기
-              </button>
+              {!futureMode && (
+                <button
+                  onClick={() => router.push('/suggestions/new')}
+                  className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-orange text-white text-xs sm:text-sm font-bold
+                             hover:bg-orange-dark hover:shadow-lg transition-all flex items-center gap-1"
+                >
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  제안하기
+                </button>
+              )}
             </div>
-            <FilterTabs activeFilter={activeFilter} onFilter={setActiveFilter} counts={categoryCounts} />
+            {!showRevealNotice && (
+              <FilterTabs activeFilter={activeFilter} onFilter={setActiveFilter} counts={categoryCounts} />
+            )}
           </div>
 
-          {suggestionsLoading ? (
+          {showRevealNotice ? null /* 인기 영역의 안내 박스로 충분 */ : suggestionsLoading && !futureMode ? (
             <div className="flex items-center justify-center py-20">
               <div className="w-8 h-8 border-2 border-navy-100 border-t-navy rounded-full animate-spin" />
             </div>
@@ -191,17 +222,19 @@ function RegionContent() {
         </motion.section>
       </div>
 
-      {/* 플로팅 제안 버튼 (모바일) */}
-      <button
-        onClick={() => router.push('/suggestions/new')}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-orange text-white shadow-xl
-                   hover:bg-orange-dark hover:scale-105 transition-all z-40
-                   flex items-center justify-center sm:hidden"
-      >
-        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-      </button>
+      {/* 플로팅 제안 버튼 (모바일) — 시민제안 모드에서만 */}
+      {!futureMode && (
+        <button
+          onClick={() => router.push('/suggestions/new')}
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-orange text-white shadow-xl
+                     hover:bg-orange-dark hover:scale-105 transition-all z-40
+                     flex items-center justify-center sm:hidden"
+        >
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      )}
 
       <GeoPattern variant="strip" className="w-full h-12" />
       <GeoPattern variant="corner-br" className="w-[250px] h-[250px] z-0 opacity-60" />

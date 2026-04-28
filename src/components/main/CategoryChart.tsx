@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { CATEGORIES, type CategoryKey } from '@/data/categories';
 import { useSuggestions } from '@/hooks/useSuggestions';
+import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
 
 export default function CategoryChart() {
   const { suggestions } = useSuggestions();
@@ -30,7 +31,10 @@ export default function CategoryChart() {
     <div className="brand-card p-4">
       <h3 className="text-navy font-bold text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
         <span className="w-3 h-3 rounded-sm bg-orange" />
-        분야별 시민제안
+        <TimelineCrossfade
+          past={<span>분야별 시민제안</span>}
+          future={<span>분야별 공약</span>}
+        />
       </h3>
 
       <div className="space-y-2.5">

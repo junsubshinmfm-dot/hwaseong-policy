@@ -5,19 +5,29 @@ import { useSearchParams } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { type CategoryKey, type RegionKey } from '@/data/categories';
 import { useSuggestions } from '@/hooks/useSuggestions';
+import { useTimeline } from '@/hooks/useTimeline';
+import { PLEDGES_FALLBACK } from '@/data/pledges';
+import { PLEDGE_COUNT } from '@/lib/timeline';
 import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
 import SearchBar from '@/components/search/SearchBar';
 import FilterBar from '@/components/search/FilterBar';
 import SuggestionGrid from '@/components/suggestion/SuggestionGrid';
 import SuggestionModal from '@/components/suggestion/SuggestionModal';
+import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
+import PledgeRevealNotice from '@/components/timeline/PledgeRevealNotice';
+import TimelineSlider from '@/components/timeline/TimelineSlider';
 import type { Suggestion } from '@/types/suggestion';
 
 type SortMode = 'relevance' | 'category' | 'region';
 
 function SearchContent() {
   const searchParams = useSearchParams();
-  const { suggestions, loading } = useSuggestions();
+  const { suggestions: citizenSuggestions, loading } = useSuggestions();
+  const { futureMode, revealed } = useTimeline();
+  const pledgeCountText = revealed ? PLEDGE_COUNT : '??';
+  const suggestions = futureMode ? PLEDGES_FALLBACK : citizenSuggestions;
+  const showRevealNotice = futureMode && !revealed;
 
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [selectedCategories, setSelectedCategories] = useState<CategoryKey[]>(() => {
@@ -82,13 +92,14 @@ function SearchContent() {
   return (
     <main className="min-h-screen bg-[#F4F5F9] relative overflow-hidden">
       <Navbar />
+      <TimelineSlider />
 
       <div className="absolute top-16 left-0 right-0 h-[140px] z-0">
         <GeoPattern variant="header" className="w-full h-full opacity-50" />
       </div>
       <GeoPattern variant="corner-br" className="w-[200px] h-[200px] z-0 opacity-50" />
 
-      <div className="relative z-10 pt-20 pb-12 px-4 md:px-8 max-w-6xl mx-auto">
+      <div className="relative z-10 pt-[220px] md:pt-[260px] pb-12 px-4 md:px-8 max-w-6xl mx-auto">
         <div className="mb-6">
           <SearchBar value={query} onChange={setQuery} />
         </div>
@@ -110,7 +121,18 @@ function SearchContent() {
                 <span className="text-orange font-extrabold">{results.length}</span>개 결과
               </>
             ) : (
-              <>전체 시민제안 <span className="text-orange font-extrabold">{suggestions.length}</span>개</>
+              <TimelineCrossfade
+                past={
+                  <span>
+                    전체 시민제안 <span className="text-orange font-extrabold">{citizenSuggestions.length}</span>개
+                  </span>
+                }
+                future={
+                  <span>
+                    전체 정명근 공약 <span className="text-orange font-extrabold">{pledgeCountText}</span>개
+                  </span>
+                }
+              />
             )}
           </p>
 
@@ -138,7 +160,9 @@ function SearchContent() {
           </div>
         </div>
 
-        {loading ? (
+        {showRevealNotice ? (
+          <PledgeRevealNotice variant="page" />
+        ) : loading && !futureMode ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 border-2 border-navy-100 border-t-navy rounded-full animate-spin" />
           </div>
