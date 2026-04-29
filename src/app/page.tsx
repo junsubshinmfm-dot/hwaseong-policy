@@ -20,7 +20,7 @@ const GlobeScene = dynamic(() => import('@/components/intro/GlobeScene'), {
         transition={{ delay: 0.3 }}
         className="text-white/30 text-sm tracking-wider"
       >
-        화성특례시 100대 공약
+        2030 정명근의 약속
       </motion.p>
     </div>
   ),

@@ -31,12 +31,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "정명근 | 화성특례시 100대 공약",
-  description: "100가지 약속, 화성의 미래",
+  title: "정명근 | 시민제안으로 만드는 2030 약속",
+  description: "시민제안으로 만드는 2030 정명근의 약속",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://policy.jmg2026.kr"),
   openGraph: {
-    title: "정명근 | 화성특례시 100대 공약",
-    description: "100가지 약속으로 화성의 미래를 만듭니다",
+    title: "정명근 | 시민제안으로 만드는 2030 약속",
+    description: "시민제안으로 만드는 2030 정명근의 약속",
     images: ["/images/og-default.jpg"],
     type: "website",
     locale: "ko_KR",

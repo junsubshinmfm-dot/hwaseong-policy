@@ -16,15 +16,15 @@ export async function generateMetadata({
   const region = REGIONS[regionId];
 
   if (!region) {
-    return { title: '화성특례시 100대 공약' };
+    return { title: '2030 정명근의 약속' };
   }
 
   return {
-    title: `${region.label} | 정명근 화성특례시 100대 공약`,
-    description: `${region.label}의 공약을 확인하세요`,
+    title: `${region.label} | 정명근의 약속`,
+    description: `${region.label} 시민제안으로 만드는 2030 정명근의 약속`,
     openGraph: {
-      title: `${region.label} | 정명근 화성특례시 100대 공약`,
-      description: `${region.label}의 공약을 확인하세요`,
+      title: `${region.label} | 정명근의 약속`,
+      description: `${region.label} 시민제안으로 만드는 2030 정명근의 약속`,
       images: ['/images/og-default.jpg'],
     },
   };
