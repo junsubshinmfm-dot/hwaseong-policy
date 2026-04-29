@@ -110,13 +110,13 @@ export default function StaticFallback({ onSkip }: StaticFallbackProps) {
                 style={{ textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}>
                 정명근
               </p>
-              <h1 className="text-white text-4xl md:text-6xl font-bold mb-3"
+              <h1 className="text-white text-3xl md:text-5xl font-bold mb-3 leading-tight"
                 style={{ textShadow: '0 4px 30px rgba(0,0,0,0.9)' }}>
-                100가지 약속
+                시민제안으로 만드는
               </h1>
-              <p className="text-[#F58220] text-xl md:text-2xl font-medium"
+              <p className="text-[#F58220] text-xl md:text-2xl font-bold"
                 style={{ textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}>
-                화성의 미래
+                2030 정명근의 약속
               </p>
             </div>
           </motion.div>

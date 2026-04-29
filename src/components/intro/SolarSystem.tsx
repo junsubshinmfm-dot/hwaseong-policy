@@ -366,10 +366,10 @@ export default function SolarSystem() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-white text-4xl md:text-6xl font-black mb-2"
+                className="text-white text-3xl md:text-5xl font-black mb-2 leading-tight"
                 style={{ textShadow: '0 4px 30px rgba(0,0,0,0.8)' }}
               >
-                100가지 약속
+                시민제안으로 만드는
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 15 }}
@@ -377,7 +377,7 @@ export default function SolarSystem() {
                 transition={{ delay: 0.5 }}
                 className="text-[#F58220] text-xl md:text-2xl font-bold mb-8"
               >
-                화성의 미래
+                2030 정명근의 약속
               </motion.p>
               <motion.div
                 initial={{ width: 0 }}

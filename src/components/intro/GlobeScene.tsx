@@ -272,20 +272,20 @@ export default function GlobeScene() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.7 }}
-                  className="text-white text-4xl md:text-6xl lg:text-7xl font-bold mb-3 leading-tight"
+                  className="text-white text-3xl md:text-5xl lg:text-6xl font-bold mb-3 leading-tight"
                   style={{ textShadow: '0 4px 30px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.6)' }}
                 >
-                  100가지 약속
+                  시민제안으로 만드는
                 </motion.h1>
 
                 <motion.p
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
-                  className="text-[#F58220] text-xl md:text-2xl lg:text-3xl font-medium"
+                  className="text-[#F58220] text-xl md:text-2xl lg:text-3xl font-bold"
                   style={{ textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}
                 >
-                  화성의 미래
+                  2030 정명근의 약속
                 </motion.p>
 
                 {/* 하단 라인 */}
