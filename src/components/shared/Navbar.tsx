@@ -41,8 +41,27 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* ── Desktop Nav: 지도 / 권역 / 카테고리 / 검색 ── */}
+          {/* ── Desktop Nav: 공명선거감시단 / 지도 / 권역 / 카테고리 / 검색 ── */}
           <div className="hidden md:flex items-center gap-1">
+            {/* 공명선거감시단 (외부 링크) */}
+            <a
+              href="https://watch-hwaseong-production.up.railway.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-navy text-white text-sm font-bold shadow-sm
+                         hover:bg-navy-dark hover:scale-[1.03] transition-all border border-orange/30"
+              aria-label="공명선거감시단 사이트로 이동"
+            >
+              <svg className="w-4 h-4 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              공명선거감시단
+              <svg className="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+
             {/* 지도 */}
             <Link
               href="/main"
@@ -251,6 +270,24 @@ export default function Navbar() {
             className="md:hidden overflow-hidden border-t border-navy-100/20 bg-white"
           >
             <div className="px-4 py-3 space-y-1">
+              {/* 공명선거감시단 (외부 링크) */}
+              <a
+                href="https://watch-hwaseong-production.up.railway.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-navy text-white text-base font-bold border border-orange/30"
+              >
+                <svg className="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                공명선거감시단
+                <svg className="w-3.5 h-3.5 ml-auto opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+
               <Link href="/main" onClick={() => setMobileOpen(false)}
                 className={`block px-4 py-3 rounded-xl text-base font-semibold ${isActive('/main') ? 'bg-navy text-white' : 'text-gray-600'}`}>
                 지도
