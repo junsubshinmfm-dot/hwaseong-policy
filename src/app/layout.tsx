@@ -38,7 +38,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: "정명근 | 시민제안으로 만드는 2030 약속",
     description: "시민제안으로 만드는 2030 정명근의 약속",
-    images: ["/images/og-default.jpg"],
+    url: "https://xn--6i0bs1vgmi4zcca6b558c.kr",
+    siteName: "정명근정책제안",
+    images: [
+      {
+        url: "/images/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "정명근 | 시민제안으로 만드는 2030 약속",
+        type: "image/jpeg",
+      },
+    ],
     type: "website",
     locale: "ko_KR",
   },
