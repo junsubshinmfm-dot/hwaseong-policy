@@ -34,7 +34,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "정명근 | 시민제안으로 만드는 2030 약속",
   description: "시민제안으로 만드는 2030 정명근의 약속",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://policy.jmg2026.kr"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://xn--6i0bs1vgmi4zcca6b558c.kr"),
   openGraph: {
     title: "정명근 | 시민제안으로 만드는 2030 약속",
     description: "시민제안으로 만드는 2030 정명근의 약속",
