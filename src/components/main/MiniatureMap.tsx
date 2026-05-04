@@ -189,16 +189,16 @@ export default function MiniatureMap() {
             href="https://watch-hwaseong-production.up.railway.app/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-navy text-white text-[11px] sm:text-xs font-bold
+            className="inline-flex items-center gap-1.5 px-3 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-navy text-white text-[13px] sm:text-xs font-bold
                        border border-orange/30 shadow-sm hover:bg-navy-dark active:scale-95 transition-all"
             aria-label="공명선거감시단 사이트로 이동"
           >
-            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+            <svg className="w-4 h-4 sm:w-4 sm:h-4 text-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
             공명선거감시단
-            <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <svg className="w-3 h-3 sm:w-3 sm:h-3 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </a>
