@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CATEGORIES, REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
@@ -8,6 +8,30 @@ import { submitSuggestion } from '@/lib/suggestions';
 import { moderateContent } from '@/lib/moderation';
 import Navbar from '@/components/shared/Navbar';
 import GeoPattern from '@/components/shared/GeoPattern';
+
+const FIELD_ORDER = [
+  'region',
+  'category',
+  'title',
+  'content',
+  'nickname',
+  'password',
+  'realName',
+  'phone',
+  'consent',
+] as const;
+
+const FIELD_LABEL: Record<string, string> = {
+  region: '권역',
+  category: '분야',
+  title: '정책 제목',
+  content: '정책 내용',
+  nickname: '닉네임',
+  password: '수정 비밀번호',
+  realName: '이름',
+  phone: '전화번호',
+  consent: '개인정보 수집 동의',
+};
 
 const categoryEntries = Object.entries(CATEGORIES) as [CategoryKey, (typeof CATEGORIES)[CategoryKey]][];
 const regionEntries = Object.entries(REGIONS) as [RegionKey, (typeof REGIONS)[RegionKey]][];
@@ -29,6 +53,7 @@ export default function NewSuggestionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ status: string; message: string } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -48,7 +73,36 @@ export default function NewSuggestionPage() {
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    if (!validate()) {
+      // 검증 실패 시 — 첫 에러 필드로 스크롤 + 안내 메시지
+      const firstErrorKey = FIELD_ORDER.find((k) => {
+        // validate 후 errors 상태가 비동기적으로 반영되므로 직접 다시 검사
+        if (k === 'region') return !region;
+        if (k === 'category') return !category;
+        if (k === 'title') return !title.trim();
+        if (k === 'content') return !content.trim();
+        if (k === 'nickname') return !nickname.trim();
+        if (k === 'password') return !password.trim() || password.trim().length < 4;
+        if (k === 'realName') return !realName.trim();
+        if (k === 'phone') return !phone.trim() || !/^[0-9-]+$/.test(phone.trim());
+        if (k === 'consent') return !consent;
+        return false;
+      });
+
+      if (firstErrorKey) {
+        const el = fieldRefs.current[firstErrorKey];
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // input/textarea면 포커스도
+        if (el && 'focus' in el && typeof el.focus === 'function') {
+          setTimeout(() => (el as HTMLInputElement).focus({ preventScroll: true }), 400);
+        }
+        setResult({
+          status: 'error',
+          message: `필수 항목 [${FIELD_LABEL[firstErrorKey]}] 을(를) 확인해주세요.`,
+        });
+      }
+      return;
+    }
 
     setSubmitting(true);
     setResult(null);
@@ -203,7 +257,7 @@ export default function NewSuggestionPage() {
         >
           <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
             {/* 지역 선택 */}
-            <div>
+            <div ref={(el) => { fieldRefs.current.region = el; }}>
               <label className="block text-navy font-bold text-sm mb-2">
                 권역 선택 <span className="text-orange">*</span>
               </label>
@@ -227,7 +281,7 @@ export default function NewSuggestionPage() {
             </div>
 
             {/* 카테고리 선택 */}
-            <div>
+            <div ref={(el) => { fieldRefs.current.category = el; }}>
               <label className="block text-navy font-bold text-sm mb-2">
                 분야 선택 <span className="text-orange">*</span>
               </label>
@@ -257,6 +311,7 @@ export default function NewSuggestionPage() {
                 정책 제목 <span className="text-orange">*</span>
               </label>
               <input
+                ref={(el) => { fieldRefs.current.title = el; }}
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -278,6 +333,7 @@ export default function NewSuggestionPage() {
                 정책 내용 <span className="text-orange">*</span>
               </label>
               <textarea
+                ref={(el) => { fieldRefs.current.content = el; }}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="제안하실 정책의 구체적인 내용을 작성해주세요"
@@ -299,6 +355,7 @@ export default function NewSuggestionPage() {
                 닉네임 <span className="text-orange">*</span>
               </label>
               <input
+                ref={(el) => { fieldRefs.current.nickname = el; }}
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
@@ -317,6 +374,7 @@ export default function NewSuggestionPage() {
                 수정 비밀번호 <span className="text-orange">*</span>
               </label>
               <input
+                ref={(el) => { fieldRefs.current.password = el; }}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -350,6 +408,7 @@ export default function NewSuggestionPage() {
                     이름 <span className="text-orange">*</span>
                   </label>
                   <input
+                    ref={(el) => { fieldRefs.current.realName = el; }}
                     type="text"
                     value={realName}
                     onChange={(e) => setRealName(e.target.value)}
@@ -368,6 +427,7 @@ export default function NewSuggestionPage() {
                     전화번호 <span className="text-orange">*</span>
                   </label>
                   <input
+                    ref={(el) => { fieldRefs.current.phone = el; }}
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -381,7 +441,7 @@ export default function NewSuggestionPage() {
                 </div>
 
                 {/* 개인정보 수집 동의 */}
-                <div className="p-4 rounded-xl bg-navy-50/50 border border-navy/[0.06]">
+                <div ref={(el) => { fieldRefs.current.consent = el; }} className="p-4 rounded-xl bg-navy-50/50 border border-navy/[0.06]">
                   <p className="font-bold text-navy text-sm mb-3">[개인정보 수집 및 이용 동의]</p>
 
                   <div className="text-navy/70 text-xs leading-relaxed space-y-3 mb-3">
@@ -457,8 +517,11 @@ export default function NewSuggestionPage() {
             </div>
 
             {result?.status === 'error' && (
-              <div className="py-3 px-4 rounded-xl bg-red-50 text-red-600 text-sm font-medium">
-                {result.message}
+              <div className="py-3 px-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-bold flex items-start gap-2">
+                <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
+                </svg>
+                <span>{result.message}</span>
               </div>
             )}
 
