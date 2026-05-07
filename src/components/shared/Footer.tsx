@@ -4,8 +4,8 @@ import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const pathname = usePathname();
-  // 인트로 / 어드민 페이지에서는 표시하지 않음
-  if (pathname === '/' || pathname.startsWith('/admin')) return null;
+  // 인트로 / 어드민 패턴(/admin, /control-*) 페이지에서는 표시하지 않음
+  if (pathname === '/' || pathname.startsWith('/admin') || pathname.startsWith('/control-')) return null;
 
   return (
     <footer className="relative z-10 border-t border-navy-100/30 bg-white/60 backdrop-blur-sm py-4 px-4">

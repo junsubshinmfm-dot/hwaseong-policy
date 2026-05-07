@@ -1,54 +1,98 @@
 {
   "rules": {
-    "likes": {
-      "$policyId": {
-        ".read": true,
-        ".write": true,
-        ".validate": "newData.isNumber() && newData.val() >= 0"
-      }
-    },
+    ".read": "auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2'",
+    ".write": "auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2'",
+
     "suggestions": {
       ".read": true,
-      ".write": true
+      "$sid": {
+        ".write": "(!data.exists() && newData.exists()) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')",
+        ".validate": "newData.hasChildren(['title','content','category','region','createdAt'])",
+        "title":          { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 200" },
+        "content":        { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 5000" },
+        "reason":         { ".validate": "newData.isString() && newData.val().length <= 5000" },
+        "expectedEffect": { ".validate": "newData.isString() && newData.val().length <= 5000" },
+        "category":       { ".validate": "newData.isString() && newData.val().matches(/^(traffic|welfare|education|economy|environment|safety|culture|housing|admin)$/)" },
+        "region":         { ".validate": "newData.isString() && newData.val().matches(/^(manse|hyohaeng|byeongjeom|dongtan)$/)" },
+        "realName":       { ".validate": "newData.isString() && newData.val().length <= 30" },
+        "phone":          { ".validate": "newData.isString() && newData.val().length <= 20" },
+        "nickname":       { ".validate": "newData.isString() && newData.val().length <= 30" },
+        "createdAt":      { ".validate": "newData.isNumber() && newData.val() <= now + 300000" },
+        "password":       { ".validate": "newData.isString() && newData.val().length <= 200" },
+
+        "likes": {
+          ".write": "(newData.isNumber() && newData.val() >= 0 && (newData.val() === data.val() + 1 || newData.val() === data.val() - 1 || (!data.exists() && newData.val() <= 1))) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "reports": {
+          ".write": "(newData.isNumber() && ((!data.exists() && newData.val() <= 1) || newData.val() === data.val() + 1)) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "status": {
+          ".write": "(newData.isString() && newData.val() === 'pending' && root.child('suggestions/' + $sid + '/reports').val() >= 3) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')",
+          ".validate": "newData.isString() && newData.val().matches(/^(pending|approved|rejected)$/)"
+        },
+
+        "$other": { ".validate": "newData.isString() || newData.isNumber() || newData.isBoolean()" }
+      }
     },
-    "feedbacks": {
-      ".read": true,
-      ".write": true
-    },
+
     "comments": {
       "$suggestionId": {
         ".read": true,
-        ".write": true,
         "$commentId": {
+          ".write": "(!data.exists() && newData.exists()) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')",
           ".validate": "newData.hasChildren(['nickname','content','passwordHash','passwordSalt','suggestionId','createdAt'])",
-          "nickname": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 15" },
-          "content": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 500" },
+          "nickname":     { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 15" },
+          "content":      { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 500" },
           "passwordHash": { ".validate": "newData.isString() && newData.val().length === 64" },
           "passwordSalt": { ".validate": "newData.isString() && newData.val().length === 32" },
           "suggestionId": { ".validate": "newData.isString() && newData.val() === $suggestionId" },
-          "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now + 300000" },
-          "$other": { ".validate": false }
+          "createdAt":    { ".validate": "newData.isNumber() && newData.val() <= now + 300000" },
+          "$other":       { ".validate": false }
         }
       }
     },
-    "presence": {
-      ".read": true,
-      ".write": true
-    },
-    "stats": {
-      ".read": true,
-      ".write": true
-    },
+
     "views": {
-      "$policyId": {
-        ".read": true,
-        ".write": true,
-        ".validate": "newData.isNumber() && newData.val() >= 0"
+      ".read": true,
+      "$sid": {
+        ".write": "(newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() <= 1) || newData.val() === data.val() + 1)) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')"
       }
     },
-    "$other": {
-      ".read": false,
-      ".write": false
+
+    "likes": {
+      "$sid": {
+        ".read": true,
+        ".write": "(newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() <= 1) || newData.val() === data.val() + 1 || newData.val() === data.val() - 1)) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')"
+      }
+    },
+
+    "feedbacks": {
+      ".read": "auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2'",
+      "$fid": {
+        ".write": "(!data.exists() && newData.exists()) || (auth != null && auth.uid === 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2')",
+        ".validate": "newData.hasChildren(['content','createdAt'])",
+        "content":   { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 2000" },
+        "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now + 300000" },
+        "$other":    { ".validate": "newData.isString() || newData.isNumber() || newData.isBoolean()" }
+      }
+    },
+
+    "presence": {
+      ".read": true,
+      "$key": {
+        ".write": true,
+        ".validate": "newData.isNumber() || newData.isString() || newData.hasChildren()"
+      }
+    },
+
+    "stats": {
+      ".read": true,
+      "$key": {
+        ".write": true,
+        ".validate": "newData.isNumber() || newData.isString() || newData.hasChildren()"
+      }
     }
   }
 }

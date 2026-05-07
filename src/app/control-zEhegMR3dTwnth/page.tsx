@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  type User,
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { CATEGORIES, REGIONS, type CategoryKey, type RegionKey } from '@/data/categories';
 import {
   subscribeAllSuggestions,
@@ -19,7 +26,11 @@ import { subscribeVisitorStats, subscribeAllPolicyViews, type VisitorStats } fro
 import type { Suggestion } from '@/types/suggestion';
 import type { Feedback } from '@/types/feedback';
 
-const ADMIN_PASSWORD = '6517';
+// 화이트리스트 — 이 UID/이메일과 정확히 일치하는 사용자만 admin 인정.
+// Firebase Auth 토큰은 서버에서 서명·검증되므로 클라이언트 비교만으로도 위조 불가.
+// 더불어 Firebase Rules에도 동일 UID 조건을 박아 DB 접근 자체를 이중 차단.
+const ADMIN_UID = 'gdLif4Zwg7PaCF7b9rLtX4DFi8h2';
+const ADMIN_EMAIL = 'junsubshin@naver.com';
 const categoryEntries = Object.entries(CATEGORIES) as [CategoryKey, (typeof CATEGORIES)[CategoryKey]][];
 const regionEntries = Object.entries(REGIONS) as [RegionKey, (typeof REGIONS)[RegionKey]][];
 
@@ -53,9 +64,13 @@ function labelForPath(path: string): string {
 }
 
 export default function AdminPage() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginBusy, setLoginBusy] = useState(false);
   const [error, setError] = useState('');
+  const authenticated = !!user && user.uid === ADMIN_UID && user.email === ADMIN_EMAIL;
   const [tab, setTab] = useState<'suggestions' | 'feedbacks' | 'stats'>('suggestions');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -73,9 +88,15 @@ export default function AdminPage() {
   });
 
   useEffect(() => {
-    if (sessionStorage.getItem('admin_auth') === 'true') {
-      setAuthenticated(true);
+    if (!auth) {
+      setAuthChecked(true);
+      return;
     }
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setAuthChecked(true);
+    });
+    return () => unsub();
   }, []);
 
   useEffect(() => {
@@ -133,13 +154,43 @@ export default function AdminPage() {
     all: suggestions.length,
   }), [suggestions]);
 
-  const handleLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      sessionStorage.setItem('admin_auth', 'true');
-      setError('');
-    } else {
-      setError('비밀번호가 틀렸습니다.');
+  const handleLogin = async () => {
+    if (!auth) {
+      setError('인증 시스템이 초기화되지 않았습니다.');
+      return;
+    }
+    setLoginBusy(true);
+    setError('');
+    try {
+      const cred = await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+      // 화이트리스트 외 계정은 즉시 로그아웃 — Firebase Auth 자체는 누구나 가입 가능
+      // 하므로 화이트리스트 검증이 필수.
+      if (cred.user.uid !== ADMIN_UID || cred.user.email !== ADMIN_EMAIL) {
+        await signOut(auth);
+        setError('이 계정은 관리자 권한이 없습니다.');
+        return;
+      }
+      setLoginPassword('');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      // Firebase Auth 에러 메시지를 사용자 친화적으로 변환
+      if (msg.includes('invalid-credential') || msg.includes('wrong-password') || msg.includes('user-not-found')) {
+        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+      } else if (msg.includes('too-many-requests')) {
+        setError('로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.');
+      } else if (msg.includes('network')) {
+        setError('네트워크 오류. 연결을 확인해주세요.');
+      } else {
+        setError('로그인에 실패했습니다.');
+      }
+    } finally {
+      setLoginBusy(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
     }
   };
 
@@ -214,6 +265,15 @@ export default function AdminPage() {
     });
   };
 
+  // 인증 상태 확인 중 — 짧은 깜빡임 방지
+  if (!authChecked) {
+    return (
+      <main className="min-h-screen bg-[#F4F5F9] flex items-center justify-center px-4">
+        <div className="text-navy/40 text-sm">인증 확인 중…</div>
+      </main>
+    );
+  }
+
   // 로그인 화면
   if (!authenticated) {
     return (
@@ -232,22 +292,38 @@ export default function AdminPage() {
             <h1 className="text-navy text-xl font-bold">관리자 로그인</h1>
             <p className="text-navy/40 text-sm mt-1">정책제안 관리 페이지</p>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              autoComplete="email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              placeholder="관리자 비밀번호"
-              className="w-full px-4 py-3 rounded-xl border border-navy/10 text-navy text-sm text-center tracking-widest
+              placeholder="이메일"
+              className="w-full px-4 py-3 rounded-xl border border-navy/10 text-navy text-sm
                          focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy
-                         placeholder:text-navy/25 placeholder:tracking-normal transition-all"
+                         placeholder:text-navy/25 transition-all"
               autoFocus
             />
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+              placeholder="비밀번호"
+              className="w-full px-4 py-3 rounded-xl border border-navy/10 text-navy text-sm
+                         focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy
+                         placeholder:text-navy/25 transition-all"
+            />
             {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-            <button onClick={handleLogin}
-              className="w-full py-3 rounded-xl bg-navy text-white font-bold text-sm hover:bg-navy-dark transition-colors">
-              로그인
+            <button
+              onClick={handleLogin}
+              disabled={loginBusy || !loginEmail || !loginPassword}
+              className="w-full py-3 rounded-xl bg-navy text-white font-bold text-sm hover:bg-navy-dark
+                         disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loginBusy ? '로그인 중…' : '로그인'}
             </button>
           </div>
         </motion.div>
@@ -284,7 +360,7 @@ export default function AdminPage() {
               </button>
             )}
             <button
-              onClick={() => { setAuthenticated(false); sessionStorage.removeItem('admin_auth'); }}
+              onClick={handleLogout}
               className="px-4 py-2 rounded-xl bg-white/10 text-white/70 text-sm font-medium hover:bg-white/20 transition-colors"
             >
               로그아웃

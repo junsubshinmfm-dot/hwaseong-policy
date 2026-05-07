@@ -1,5 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
+import { getAuth, type Auth } from 'firebase/auth';
 
 // GitHub Secrets/CI 환경변수에 줄바꿈/공백이 섞여 들어오는 사고를 차단.
 // (예: 웹에서 API 키를 붙여넣을 때 trailing newline이 함께 등록되어 빌드 산출물에
@@ -40,4 +41,5 @@ const app = hasConfig
   : null;
 
 export const db = app ? getDatabase(app) : null;
+export const auth: Auth | null = app ? getAuth(app) : null;
 export const isFirebaseConfigured = hasConfig;
