@@ -8,9 +8,11 @@ import { REGIONS, type RegionKey } from '@/data/categories';
 import regionsData from '@/data/regions.json';
 import RegionTooltip from './RegionTooltip';
 
+// REGION_PATHS는 지리적 4개 권역만 정의 — 'common'은 가상 분류라 지도 path가 없음.
+type GeoRegionKey = Exclude<RegionKey, 'common'>;
 const regionEntries = Object.entries(REGION_PATHS) as [
-  RegionKey,
-  (typeof REGION_PATHS)[RegionKey],
+  GeoRegionKey,
+  (typeof REGION_PATHS)[GeoRegionKey],
 ][];
 
 export default function RegionMap() {

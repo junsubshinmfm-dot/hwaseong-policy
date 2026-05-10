@@ -31,7 +31,8 @@ const FUTURE_PREVIEW_FILTER = '';
  *   3권역 병점구: 우상단 (북동쪽)
  *   4권역 동탄구: 우하단 (남동쪽, 가장 큰 인구)
  */
-const REGION_POLYGONS: Record<RegionKey, {
+// 'common' 권역은 지리적 다각형이 아닌 가상 분류이므로 지도에서는 제외.
+const REGION_POLYGONS: Record<Exclude<RegionKey, 'common'>, {
   points: string;
   labelX: number; labelY: number;
 }> = {
@@ -63,7 +64,9 @@ const REGION_POLYGONS: Record<RegionKey, {
   },
 };
 
-const regionKeys: RegionKey[] = ['dongtan', 'byeongjeom', 'manse', 'hyohaeng'];
+// 'common'은 지리적 권역이 아니라 지도에 표시하지 않음.
+type GeoRegionKey = Exclude<RegionKey, 'common'>;
+const regionKeys: GeoRegionKey[] = ['dongtan', 'byeongjeom', 'manse', 'hyohaeng'];
 
 const categoryIcons: Record<string, string> = {
   traffic: '\u{1F687}', welfare: '\u{1F3E5}', education: '\u{1F4DA}', economy: '\u{1F4B0}',

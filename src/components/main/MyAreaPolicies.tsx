@@ -7,7 +7,8 @@ import { REGIONS, CATEGORIES, type RegionKey, type CategoryKey } from '@/data/ca
 import { useSuggestions } from '@/hooks/useSuggestions';
 import TimelineCrossfade from '@/components/timeline/TimelineCrossfade';
 
-const REGION_POINTS: Record<RegionKey, { lat: number; lng: number }[]> = {
+// 'common'은 지리적 좌표가 없는 가상 권역 — 지도 좌표 매핑에서 제외.
+const REGION_POINTS: Record<Exclude<RegionKey, 'common'>, { lat: number; lng: number }[]> = {
   manse: [
     { lat: 37.138, lng: 126.925 }, { lat: 37.210, lng: 126.822 },
     { lat: 37.098, lng: 126.844 }, { lat: 37.154, lng: 126.790 },
